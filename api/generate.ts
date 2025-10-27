@@ -35,6 +35,18 @@ export default async function handler(request: Request) {
   } catch (error) {
     console.error('[API /generate] Error:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
+
+    // Check for Gemini's specific rate limit error code within the message
+    if (errorMessage.includes('"code":429') || errorMessage.includes('RESOURCE_EXHAUSTED')) {
+      return new Response(JSON.stringify({ 
+        error: "You've reached the free request limit. Please try again in a few minutes." 
+      }), {
+        status: 429, // Too Many Requests
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // For all other errors, return a generic server error
     return new Response(JSON.stringify({ error: `Server error: ${errorMessage}` }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
