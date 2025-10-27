@@ -1,3 +1,5 @@
+import type { ApiKeyStatus } from '../types';
+
 /**
  * Calls our internal API endpoint to generate an image securely.
  * @param prompt The text prompt to send to the backend.
@@ -20,4 +22,25 @@ export async function generateImageFromApi(prompt: string): Promise<string[]> {
   }
 
   return data.imageUrls;
+}
+
+/**
+ * Calls our internal API endpoint to get the status of the server-side API key.
+ * @returns A promise that resolves to an object containing the masked API key.
+ */
+export async function getApiKeyStatus(): Promise<ApiKeyStatus> {
+    const response = await fetch('/api/status', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.error || `Request failed with status ${response.status}`);
+    }
+
+    return data;
 }

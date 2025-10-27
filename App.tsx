@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import Header from './components/Header';
 import PromptInput from './components/PromptInput';
 import ImageDisplay from './components/ImageDisplay';
+import ApiKeyStatus from './components/ApiKeyStatus';
 import { generateImageFromApi } from './services/clientService';
 import type { GeneratedImage } from './types';
 
@@ -37,6 +38,7 @@ function App() {
     <div className="min-h-screen text-gray-800 dark:text-gray-100 flex flex-col items-center font-sans p-4 sm:p-6">
       <div className="w-full max-w-4xl" aria-busy={isLoading}>
         <Header />
+        <ApiKeyStatus />
         <main className="mt-8">
           <PromptInput onGenerate={handleGenerate} isLoading={isLoading} />
           <div className="mt-12">
