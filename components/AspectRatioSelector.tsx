@@ -1,11 +1,15 @@
 import React from 'react';
+// FIX: Import AspectRatioType for strong typing of props and local variables.
+import type { AspectRatioType } from '../types';
 
 interface AspectRatioSelectorProps {
-  selectedRatio: string;
-  onSelectRatio: (ratio: string) => void;
+  // FIX: Use the specific AspectRatioType for selectedRatio and the onSelectRatio callback.
+  selectedRatio: AspectRatioType;
+  onSelectRatio: (ratio: AspectRatioType) => void;
 }
 
-const ratios = ["1:1", "16:9", "9:16", "4:3", "3:4"];
+// FIX: Type the ratios array with AspectRatioType.
+const ratios: AspectRatioType[] = ["1:1", "16:9", "9:16", "4:3", "3:4"];
 
 const AspectRatioSelector: React.FC<AspectRatioSelectorProps> = ({ selectedRatio, onSelectRatio }) => {
   return (
