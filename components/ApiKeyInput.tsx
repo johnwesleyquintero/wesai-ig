@@ -28,7 +28,7 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onKeySaved }) => {
 
   return (
     <div className="w-full">
-      <label htmlFor="api-key-input" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+      <label htmlFor="api-key-input" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
         Hugging Face API Key
       </label>
       <div className="flex flex-col sm:flex-row gap-2">
@@ -38,7 +38,7 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onKeySaved }) => {
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder="Enter your API key..."
-          className="flex-grow p-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500"
+          className="flex-grow p-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500"
         />
         <button
           onClick={handleSave}
@@ -53,7 +53,7 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onKeySaved }) => {
           API Key saved!
         </p>
       )}
-      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+      <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
           Your key is stored only in your browser. Get yours from your <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer" className="font-semibold underline hover:text-indigo-500">Hugging Face account settings</a>.
       </p>
     </div>

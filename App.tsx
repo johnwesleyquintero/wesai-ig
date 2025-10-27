@@ -54,7 +54,7 @@ function App() {
   }, [apiKey]);
 
   return (
-    <div className="min-h-screen text-gray-800 dark:text-gray-100 flex flex-col items-center font-sans p-4 sm:p-6">
+    <div className="min-h-screen text-slate-800 dark:text-slate-200 flex flex-col items-center font-sans p-4 sm:p-6">
       <div className="w-full max-w-4xl" aria-busy={isLoading}>
         <Header onOpenSettings={() => setIsSettingsModalOpen(true)} />
         <main className="mt-8 space-y-12">

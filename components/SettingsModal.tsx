@@ -49,14 +49,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
     >
         <div className="fixed inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm"></div>
         <div 
-            className={`bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 w-full max-w-md m-4 relative transform transition-all duration-300 ease-in-out ${show ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`} 
+            className={`bg-white dark:bg-slate-800 rounded-lg shadow-2xl p-6 w-full max-w-md m-4 relative transform transition-all duration-300 ease-in-out ${show ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`} 
             onClick={e => e.stopPropagation()}
         >
-            <div className="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700 pb-3">
-                <h2 id="settings-modal-title" className="text-xl font-bold text-gray-800 dark:text-gray-200">Settings</h2>
+            <div className="flex justify-between items-center mb-4 border-b border-slate-200 dark:border-slate-700 pb-3">
+                <h2 id="settings-modal-title" className="text-xl font-bold text-slate-900 dark:text-slate-100">Settings</h2>
                 <button 
                     onClick={onClose} 
-                    className="p-1 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-pink-500"
                     aria-label="Close settings"
                 >
                     <CloseIcon />

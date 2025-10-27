@@ -23,7 +23,7 @@ const ThemeSwitcher: React.FC = () => {
     return (
         <button
             onClick={handleThemeChange}
-            className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 focus:ring-offset-white dark:focus:ring-offset-gray-900 transition-colors duration-200"
+            className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 focus:ring-offset-white dark:focus:ring-offset-slate-900 transition-colors duration-200"
             aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
         >
             {resolvedTheme === 'dark' ? <SunIcon /> : <MoonIcon />}

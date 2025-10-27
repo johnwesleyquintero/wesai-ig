@@ -28,10 +28,10 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, p
   return (
     <div aria-live="polite">
       {isLoading && (
-        <div className="flex flex-col items-center justify-center text-center p-8 bg-gray-100 dark:bg-gray-800 rounded-lg">
+        <div className="flex flex-col items-center justify-center text-center p-8 bg-slate-100 dark:bg-slate-800 rounded-lg">
           <Spinner size="large" />
-          <p className="mt-4 text-lg text-gray-700 dark:text-gray-300">Generating your masterpiece...</p>
-          <p className="text-sm text-gray-500">This may take a moment.</p>
+          <p className="mt-4 text-lg text-slate-700 dark:text-slate-300">Generating your masterpiece...</p>
+          <p className="text-sm text-slate-500">This may take a moment.</p>
         </div>
       )}
 
@@ -41,16 +41,16 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, p
         <div className="space-y-12">
           {/* Original Image Display */}
           <div>
-            <div className="flex justify-between items-center mb-4 border-b-2 border-gray-200 dark:border-gray-700 pb-2">
-                <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">Generated Image</h2>
-                <button onClick={handleCopyPrompt} className="flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-pink-600 dark:hover:text-pink-500 transition-colors duration-200">
+            <div className="flex justify-between items-center mb-4 border-b-2 border-slate-200 dark:border-slate-700 pb-2">
+                <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Generated Image</h2>
+                <button onClick={handleCopyPrompt} className="flex items-center text-sm text-slate-500 dark:text-slate-400 hover:text-pink-600 dark:hover:text-pink-500 transition-colors duration-200">
                     <CopyIcon />
                     <span className="ml-2">{copied ? 'Copied!' : 'Copy Prompt'}</span>
                 </button>
             </div>
             <div className="grid grid-cols-1 gap-8">
               {images.map((image, index) => (
-                <div key={index} className="group relative bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                <div key={index} className="group relative bg-white dark:bg-slate-800 p-4 rounded-lg shadow-lg overflow-hidden border border-slate-200 dark:border-slate-700">
                    <img
                       src={image.src}
                       alt={`Generated image for prompt: ${prompt}`}
@@ -60,7 +60,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, p
                      <a
                        href={image.src}
                        download={`generated-image-${Date.now()}.jpeg`}
-                       className="bg-white text-gray-900 px-4 py-2 rounded-lg flex items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform group-hover:scale-100 scale-95 hover:bg-gray-200"
+                       className="bg-white text-slate-900 px-4 py-2 rounded-lg flex items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform group-hover:scale-100 scale-95 hover:bg-slate-100"
                      >
                         <DownloadIcon />
                         Download
@@ -96,10 +96,10 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, p
       )}
 
       {!isLoading && !error && images.length === 0 && (
-        <div className="text-center p-12 bg-gray-50 dark:bg-gray-800/50 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+        <div className="text-center p-12 bg-slate-100/50 dark:bg-slate-800/50 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg">
           <ImageIcon />
-          <p className="mt-4 text-lg font-medium text-gray-600 dark:text-gray-400">Your generated images will appear here.</p>
-          <p className="text-gray-500 text-sm mt-1">Enter a prompt above and click "Generate Image" to start.</p>
+          <p className="mt-4 text-lg font-medium text-slate-600 dark:text-slate-400">Your generated images will appear here.</p>
+          <p className="text-slate-500 text-sm mt-1">Enter a prompt above and click "Generate Image" to start.</p>
         </div>
       )}
     </div>

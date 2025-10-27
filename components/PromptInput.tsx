@@ -43,7 +43,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
         placeholder={placeholderText}
-        className="w-full h-28 p-4 bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 rounded-lg shadow-inner focus:ring-2 focus:ring-pink-500 focus:outline-none resize-none transition-colors duration-200 ease-in-out dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-500"
+        className="w-full h-28 p-4 bg-white border border-slate-300 text-slate-900 placeholder-slate-400 rounded-lg shadow-inner focus:ring-2 focus:ring-pink-500 focus:outline-none resize-none transition-colors duration-200 ease-in-out dark:bg-slate-800 dark:border-slate-600 dark:text-slate-50 dark:placeholder-slate-500"
         disabled={isLoading || !isApiKeySet}
         aria-label="Image generation prompt"
       />
@@ -53,7 +53,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
       <button
         type="submit"
         disabled={isLoading || !prompt.trim() || !isApiKeySet}
-        className="w-full sm:w-auto px-8 py-3 mt-2 flex items-center justify-center font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg shadow-md hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300"
+        className="w-full sm:w-auto px-8 py-3 mt-2 flex items-center justify-center font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg shadow-md hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 dark:focus:ring-purple-800"
       >
         {isLoading ? (
           <>

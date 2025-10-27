@@ -9,8 +9,8 @@ const MockupDisplay: React.FC<MockupDisplayProps> = ({ mockupSrc }) => {
     
   return (
     <div className="mt-8">
-      <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4 border-b-2 border-gray-200 dark:border-gray-700 pb-2">A+ Content Mockup</h2>
-      <div className="bg-gray-200 dark:bg-gray-700 p-4 sm:p-6 rounded-lg shadow-xl inline-block">
+      <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-4 border-b-2 border-slate-200 dark:border-slate-700 pb-2">A+ Content Mockup</h2>
+      <div className="bg-slate-200 dark:bg-slate-700 p-4 sm:p-6 rounded-lg shadow-xl inline-block">
         <div className="bg-white p-2 rounded-md">
             <img
                 src={mockupSrc}
