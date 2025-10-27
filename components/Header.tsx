@@ -11,7 +11,7 @@ const Header: React.FC = () => {
         WesAI Image Generator
       </h1>
       <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
-        Powered by Google's Imagen 4 Model
+        Powered by Google's Gemini Flash
       </p>
     </header>
   );

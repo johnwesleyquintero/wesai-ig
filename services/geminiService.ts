@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Modality } from "@google/genai";
 
 // This check ensures this code only runs in a server-like environment where process.env is available.
 if (!process.env.API_KEY) {
@@ -9,31 +9,39 @@ if (!process.env.API_KEY) {
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 /**
- * Generates an image using the Imagen 4 model.
+ * Generates an image using the Gemini 2.5 Flash Image model.
  * This function is intended to be called from a secure, server-side environment.
  * @param prompt The text prompt to generate an image from.
  * @returns A promise that resolves to an array of base64 data URLs for the generated images.
  */
 export async function generateImage(prompt: string): Promise<string[]> {
   try {
-    const response = await ai.models.generateImages({
-      model: 'imagen-4.0-generate-001',
-      prompt: prompt,
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: {
+        parts: [
+          { text: prompt },
+        ],
+      },
       config: {
-        numberOfImages: 1,
-        outputMimeType: 'image/jpeg',
-        aspectRatio: '1:1',
+        responseModalities: [Modality.IMAGE],
       },
     });
 
-    if (!response.generatedImages || response.generatedImages.length === 0) {
-      throw new Error("No images were generated. The prompt may have been blocked or the API key is invalid.");
+    const imageUrls: string[] = [];
+    if (response.candidates && response.candidates.length > 0 && response.candidates[0].content) {
+        for (const part of response.candidates[0].content.parts) {
+            if (part.inlineData) {
+                const base64ImageBytes: string = part.inlineData.data;
+                const mimeType = part.inlineData.mimeType;
+                imageUrls.push(`data:${mimeType};base64,${base64ImageBytes}`);
+            }
+        }
     }
 
-    const imageUrls = response.generatedImages.map(img => {
-      const base64ImageBytes = img.image.imageBytes;
-      return `data:image/jpeg;base64,${base64ImageBytes}`;
-    });
+    if (imageUrls.length === 0) {
+      throw new Error("No images were generated. The prompt may have been blocked or the API key is invalid.");
+    }
     
     return imageUrls;
   } catch (error) {
