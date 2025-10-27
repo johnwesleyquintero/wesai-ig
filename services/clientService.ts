@@ -1,60 +1,42 @@
-import { GoogleGenAI, Modality } from "@google/genai";
-
 /**
- * Generates an image using the Gemini 2.5 Flash Image model directly from the client.
+ * Generates an image by sending a request to our own serverless API endpoint.
+ * This acts as a proxy to the Google Gemini API, enhancing security and avoiding browser-based restrictions.
  * @param prompt The text prompt to generate an image from.
  * @param apiKey The user-provided Google Gemini API key.
  * @returns A promise that resolves to an array of base64 data URLs for the generated images.
  */
 export async function generateImage(prompt: string, apiKey: string): Promise<string[]> {
   if (!apiKey) {
+    // This client-side check prevents an unnecessary API call if the key is missing.
     throw new Error("API Key is missing.");
   }
 
   try {
-    // Initialize the AI client with the user's API key for each request.
-    const ai = new GoogleGenAI({ apiKey });
-
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-image',
-      contents: {
-        parts: [
-          { text: prompt },
-        ],
+    const response = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      config: {
-        responseModalities: [Modality.IMAGE],
-      },
+      body: JSON.stringify({ prompt, apiKey }),
     });
 
-    const imageUrls: string[] = [];
-    if (response.candidates && response.candidates.length > 0 && response.candidates[0].content) {
-      for (const part of response.candidates[0].content.parts) {
-        if (part.inlineData) {
-          const base64ImageBytes: string = part.inlineData.data;
-          const mimeType = part.inlineData.mimeType;
-          imageUrls.push(`data:${mimeType};base64,${base64ImageBytes}`);
-        }
-      }
+    // The response from our own API endpoint needs to be parsed as JSON.
+    const data = await response.json();
+
+    if (!response.ok) {
+      // If the server returned an error (e.g., 4xx or 5xx), 'data.message' should contain the reason.
+      // This propagates the error from the serverless function to the UI.
+      throw new Error(data.message || 'An unknown error occurred from the server.');
     }
 
-    if (imageUrls.length === 0) {
-      throw new Error("No images were generated. The prompt may have been blocked or the API key is invalid.");
+    if (!data.imageUrls || data.imageUrls.length === 0) {
+      throw new Error("API returned no images. The prompt may have been blocked or the API key is invalid.");
     }
     
-    return imageUrls;
+    return data.imageUrls;
   } catch (error) {
-    console.error("Error generating image with Gemini API:", error);
-    if (error instanceof Error) {
-        // Provide more specific feedback for common errors
-        if (error.message.includes('API key not valid')) {
-            return Promise.reject(new Error('The provided API key is not valid. Please check it and try again.'));
-        }
-        if (error.message.includes('Quota exceeded')) {
-            return Promise.reject(new Error("You've reached the free request limit for this key. Please try again later or use a different key."));
-        }
-        return Promise.reject(new Error(`Gemini API Error: ${error.message}`));
-    }
-    return Promise.reject(new Error("An unknown error occurred while generating the image."));
+    console.error("Error calling /api/generate:", error);
+    // Re-throw the error so it can be caught by the App component and displayed to the user.
+    throw error;
   }
 }
