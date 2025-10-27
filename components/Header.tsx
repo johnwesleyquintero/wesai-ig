@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ThemeSwitcher from './ThemeSwitcher';
 import SettingsModal from './SettingsModal';
+import type { ModelType } from '../App';
 
 const GearIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -8,8 +9,14 @@ const GearIcon = () => (
     </svg>
 );
 
-const Header: React.FC = () => {
+interface HeaderProps {
+    model: ModelType;
+}
+
+const Header: React.FC<HeaderProps> = ({ model }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const modelName = model === 'imagen-4.0-generate-001' ? 'Imagen 4' : 'Gemini Flash';
 
     return (
     <>
@@ -28,7 +35,7 @@ const Header: React.FC = () => {
           WesAI Image Generator
         </h1>
         <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
-          Powered by Google's Imagen 4
+          Powered by Google's {modelName}
         </p>
       </header>
       <SettingsModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />

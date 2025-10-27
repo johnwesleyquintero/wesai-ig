@@ -9,7 +9,7 @@ const ratios = ["1:1", "16:9", "9:16", "4:3", "3:4"];
 
 const AspectRatioSelector: React.FC<AspectRatioSelectorProps> = ({ selectedRatio, onSelectRatio }) => {
   return (
-    <div className="w-full flex flex-col items-center my-2">
+    <div className="flex flex-col items-center">
       <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">Aspect Ratio</label>
       <div className="flex flex-wrap justify-center gap-3">
         {ratios.map(ratio => (

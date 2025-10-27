@@ -1,12 +1,15 @@
+import type { ModelType } from '../App';
+
 /**
  * Generates an image by sending a request to our own serverless API endpoint.
  * This acts as a proxy to the Google Gemini API, enhancing security and avoiding browser-based restrictions.
  * @param prompt The text prompt to generate an image from.
  * @param apiKey The user-provided Google Gemini API key.
  * @param aspectRatio The desired aspect ratio for the image.
+ * @param model The generation model to use ('gemini-2.5-flash-image' or 'imagen-4.0-generate-001').
  * @returns A promise that resolves to an array of base64 data URLs for the generated images.
  */
-export async function generateImage(prompt: string, apiKey: string, aspectRatio: string): Promise<string[]> {
+export async function generateImage(prompt: string, apiKey: string, aspectRatio: string, model: ModelType): Promise<string[]> {
   if (!apiKey) {
     // This client-side check prevents an unnecessary API call if the key is missing.
     throw new Error("API Key is missing.");
@@ -18,7 +21,7 @@ export async function generateImage(prompt: string, apiKey: string, aspectRatio:
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ prompt, apiKey, aspectRatio }),
+      body: JSON.stringify({ prompt, apiKey, aspectRatio, model }),
     });
 
     // The response from our own API endpoint needs to be parsed as JSON.
