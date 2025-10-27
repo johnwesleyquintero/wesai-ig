@@ -10,6 +10,7 @@ function App() {
   const [images, setImages] = useState<GeneratedImage[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isQuotaError, setIsQuotaError] = useState<boolean>(false);
   const { apiKey } = useApiKey();
 
   const handleGenerate = useCallback(async (prompt: string) => {
@@ -24,6 +25,7 @@ function App() {
 
     setIsLoading(true);
     setError(null);
+    setIsQuotaError(false);
     setImages([]);
 
     try {
@@ -32,7 +34,20 @@ function App() {
       setImages(formattedImages);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred.";
-      setError(`Failed to generate image: ${errorMessage}`);
+      // Try to parse the error message as it might be a JSON string from our API
+      try {
+        const errorData = JSON.parse(errorMessage);
+        if (errorData?.error?.status === 'RESOURCE_EXHAUSTED') {
+          setError("You've exceeded your current API quota.");
+          setIsQuotaError(true);
+        } else {
+           // Use the message from the parsed JSON if available, otherwise default to the raw message
+          setError(`Failed to generate image: ${errorData?.message || errorMessage}`);
+        }
+      } catch (parseError) {
+        // If it's not JSON, just show the raw message
+        setError(`Failed to generate image: ${errorMessage}`);
+      }
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -46,7 +61,7 @@ function App() {
         <main className="mt-8">
           <PromptInput onGenerate={handleGenerate} isLoading={isLoading} isApiKeySet={!!apiKey} />
           <div className="mt-12">
-            <ImageDisplay images={images} isLoading={isLoading} error={error} />
+            <ImageDisplay images={images} isLoading={isLoading} error={error} isQuotaError={isQuotaError} />
           </div>
         </main>
       </div>

@@ -8,9 +8,10 @@ interface ImageDisplayProps {
   images: GeneratedImage[];
   isLoading: boolean;
   error: string | null;
+  isQuotaError?: boolean;
 }
 
-const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error }) => {
+const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, isQuotaError }) => {
   const [mockupSrc, setMockupSrc] = useState<string | null>(null);
   const [isCreatingMockup, setIsCreatingMockup] = useState<boolean>(false);
 
@@ -87,7 +88,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error })
         </div>
       )}
 
-      {error && <ErrorAlert message={error} />}
+      {error && <ErrorAlert message={error} isQuotaError={isQuotaError} />}
 
       {!isLoading && !error && images.length > 0 && (
         <div className="space-y-12">
