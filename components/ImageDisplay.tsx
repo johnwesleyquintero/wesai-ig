@@ -1,6 +1,5 @@
 import React from 'react';
 import type { GeneratedImage } from '../types';
-import type { ModelType } from '../App';
 import useMockup from '../hooks/useMockup';
 import Spinner from './Spinner';
 import ErrorAlert from './ErrorAlert';
@@ -13,10 +12,9 @@ interface ImageDisplayProps {
   error: string | null;
   prompt: string;
   isQuotaError?: boolean;
-  model: ModelType;
 }
 
-const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, prompt, isQuotaError, model }) => {
+const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, prompt, isQuotaError }) => {
   const { mockupSrc, isCreatingMockup, createMockup } = useMockup(images.length > 0 ? images[0].src : null);
   const [copied, setCopied] = React.useState(false);
 
@@ -25,8 +23,6 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, p
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
   };
-  
-  const isMockupDisabled = model === 'gemini-2.5-flash-image' || isCreatingMockup;
   
   // This wrapper will announce content changes to screen readers
   return (
@@ -78,10 +74,9 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, p
           {/* A+ Mockup Section */}
           <div className="text-center">
               {!mockupSrc && (
-                <div className="relative inline-block" title={isMockupDisabled && !isCreatingMockup ? "Mockup feature is optimized for the high-quality output of Imagen 4." : ""}>
                   <button
                       onClick={createMockup}
-                      disabled={isMockupDisabled}
+                      disabled={isCreatingMockup}
                       className="px-8 py-3 flex items-center justify-center mx-auto font-semibold text-white bg-gradient-to-r from-green-500 to-teal-500 rounded-lg shadow-md hover:from-green-600 hover:to-teal-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300"
                   >
                       {isCreatingMockup ? (
@@ -93,7 +88,6 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, p
                           'Create A+ Mockup'
                       )}
                   </button>
-                </div>
               )}
               
               {mockupSrc && <MockupDisplay mockupSrc={mockupSrc} />}

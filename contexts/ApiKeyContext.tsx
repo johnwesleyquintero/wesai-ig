@@ -11,7 +11,7 @@ export const ApiKeyProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const [apiKey, setApiKeyState] = useState<string | null>(() => {
     // Get the key from localStorage on initial load
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('google-api-key');
+      return localStorage.getItem('huggingface-api-key');
     }
     return null;
   });
@@ -19,9 +19,9 @@ export const ApiKeyProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   // Effect to update localStorage whenever the key changes
   useEffect(() => {
     if (apiKey) {
-      localStorage.setItem('google-api-key', apiKey);
+      localStorage.setItem('huggingface-api-key', apiKey);
     } else {
-      localStorage.removeItem('google-api-key');
+      localStorage.removeItem('huggingface-api-key');
     }
   }, [apiKey]);
 

@@ -29,7 +29,7 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onKeySaved }) => {
   return (
     <div className="w-full">
       <label htmlFor="api-key-input" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-        Google Gemini API Key
+        Hugging Face API Key
       </label>
       <div className="flex flex-col sm:flex-row gap-2">
         <input
@@ -54,7 +54,7 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onKeySaved }) => {
         </p>
       )}
       <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-          Your key is stored only in your browser and is required to generate images.
+          Your key is stored only in your browser. Get yours from your <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer" className="font-semibold underline hover:text-indigo-500">Hugging Face account settings</a>.
       </p>
     </div>
   );

@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { ApiKeyProvider } from './contexts/ApiKeyContext';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -13,9 +12,7 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <ThemeProvider>
-      <ApiKeyProvider>
-        <App />
-      </ApiKeyProvider>
+      <App />
     </ThemeProvider>
   </React.StrictMode>
 );

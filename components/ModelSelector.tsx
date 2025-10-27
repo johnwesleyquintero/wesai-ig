@@ -1,5 +1,6 @@
 import React from 'react';
-import type { ModelType } from '../App';
+// FIX: Corrected the import path for ModelType. It's now imported from types.ts.
+import type { ModelType } from '../types';
 
 interface ModelSelectorProps {
   selectedModel: ModelType;
