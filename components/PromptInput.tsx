@@ -1,10 +1,20 @@
 import React, { useState } from 'react';
 import Spinner from './Spinner';
 import SamplePrompts from './SamplePrompts';
+// FIX: Import new components for model and aspect ratio selection.
+import ModelSelector from './ModelSelector';
+import AspectRatioSelector from './AspectRatioSelector';
+import type { ModelType } from '../types';
+
 
 interface PromptInputProps {
   onGenerate: (prompt: string) => void;
   isLoading: boolean;
+  // FIX: Removed isApiKeySet and added props for model and aspect ratio management.
+  selectedModel: ModelType;
+  onSelectModel: (model: ModelType) => void;
+  selectedRatio: string;
+  onSelectRatio: (ratio: string) => void;
 }
 
 const samplePrompts = [
@@ -14,11 +24,12 @@ const samplePrompts = [
   "A watercolor painting of a cozy cafe in Paris on a rainy day, people visible through the steamy window.",
 ];
 
-const PromptInput: React.FC<PromptInputProps> = ({ onGenerate, isLoading }) => {
+const PromptInput: React.FC<PromptInputProps> = ({ onGenerate, isLoading, selectedModel, onSelectModel, selectedRatio, onSelectRatio }) => {
   const [prompt, setPrompt] = useState<string>('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // FIX: Simplified condition to check only for loading state.
     if (!isLoading) {
       onGenerate(prompt);
     }
@@ -33,7 +44,7 @@ const PromptInput: React.FC<PromptInputProps> = ({ onGenerate, isLoading }) => {
       <textarea
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
-        // FIX: Removed conditional placeholder text related to API key.
+        // FIX: Updated placeholder text as API key is no longer required from the user.
         placeholder={"e.g., A majestic lion wearing a crown, studio lighting..."}
         className="w-full h-28 p-4 bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 rounded-lg shadow-inner focus:ring-2 focus:ring-pink-500 focus:outline-none resize-none transition-colors duration-200 ease-in-out dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-500"
         // FIX: Removed isApiKeySet from disabled logic.
@@ -42,6 +53,15 @@ const PromptInput: React.FC<PromptInputProps> = ({ onGenerate, isLoading }) => {
       
       <SamplePrompts prompts={samplePrompts} onSelect={handleSelectSample} />
       
+      {/* FIX: Added Model and Aspect Ratio selectors to the UI. */}
+      <div className="w-full flex flex-col sm:flex-row justify-center items-center gap-8 my-4">
+          <ModelSelector selectedModel={selectedModel} onSelectModel={onSelectModel} />
+          {/* FIX: Conditionally render AspectRatioSelector only for the 'imagen' model which supports it. */}
+          {selectedModel === 'imagen-4.0-generate-001' && (
+            <AspectRatioSelector selectedRatio={selectedRatio} onSelectRatio={onSelectRatio} />
+          )}
+      </div>
+
       <button
         type="submit"
         // FIX: Removed isApiKeySet from disabled logic.

@@ -12,6 +12,7 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <ThemeProvider>
+      {/* FIX: Removed ApiKeyProvider as the API key is now handled securely on the backend. */}
       <App />
     </ThemeProvider>
   </React.StrictMode>

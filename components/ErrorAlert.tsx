@@ -2,7 +2,7 @@ import React from 'react';
 
 interface ErrorAlertProps {
   message: string;
-  isQuotaError?: boolean;
+  // FIX: Removed isQuotaError as it was specific to the old API and is no longer needed.
 }
 
 const ErrorAlert: React.FC<ErrorAlertProps> = ({ message }) => {

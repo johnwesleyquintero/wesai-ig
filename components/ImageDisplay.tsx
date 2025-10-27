@@ -11,10 +11,10 @@ interface ImageDisplayProps {
   isLoading: boolean;
   error: string | null;
   prompt: string;
-  isQuotaError?: boolean;
+  // FIX: Removed isQuotaError prop as it is no longer used.
 }
 
-const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, prompt, isQuotaError }) => {
+const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, prompt }) => {
   const { mockupSrc, isCreatingMockup, createMockup } = useMockup(images.length > 0 ? images[0].src : null);
   const [copied, setCopied] = React.useState(false);
 
@@ -35,7 +35,8 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, p
         </div>
       )}
 
-      {error && <ErrorAlert message={error} isQuotaError={isQuotaError} />}
+      {/* FIX: Removed isQuotaError prop from ErrorAlert. */}
+      {error && <ErrorAlert message={error} />}
 
       {!isLoading && !error && images.length > 0 && (
         <div className="space-y-12">
