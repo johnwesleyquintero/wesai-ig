@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import Spinner from './Spinner';
 import SamplePrompts from './SamplePrompts';
+import AspectRatioSelector from './AspectRatioSelector';
 
 interface PromptInputProps {
-  onGenerate: (prompt: string) => void;
+  onGenerate: (prompt: string, aspectRatio: string) => void;
   isLoading: boolean;
   isApiKeySet: boolean;
 }
@@ -17,11 +18,12 @@ const samplePrompts = [
 
 const PromptInput: React.FC<PromptInputProps> = ({ onGenerate, isLoading, isApiKeySet }) => {
   const [prompt, setPrompt] = useState<string>('');
+  const [aspectRatio, setAspectRatio] = useState<string>('1:1');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLoading && isApiKeySet) {
-      onGenerate(prompt);
+      onGenerate(prompt, aspectRatio);
     }
   };
   
@@ -40,6 +42,8 @@ const PromptInput: React.FC<PromptInputProps> = ({ onGenerate, isLoading, isApiK
       />
       
       <SamplePrompts prompts={samplePrompts} onSelect={handleSelectSample} />
+      
+      <AspectRatioSelector selectedRatio={aspectRatio} onSelectRatio={setAspectRatio} />
 
       <button
         type="submit"

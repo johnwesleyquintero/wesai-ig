@@ -11,9 +11,10 @@ function App() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isQuotaError, setIsQuotaError] = useState<boolean>(false);
+  const [lastPrompt, setLastPrompt] = useState<string>('');
   const { apiKey } = useApiKey();
 
-  const handleGenerate = useCallback(async (prompt: string) => {
+  const handleGenerate = useCallback(async (prompt: string, aspectRatio: string) => {
     if (!apiKey) {
       setError("Please set your Google Gemini API key in the settings first.");
       return;
@@ -27,22 +28,40 @@ function App() {
     setError(null);
     setIsQuotaError(false);
     setImages([]);
+    setLastPrompt('');
 
     try {
-      const generatedImageUrls = await generateImage(prompt, apiKey);
+      const generatedImageUrls = await generateImage(prompt, apiKey, aspectRatio);
       const formattedImages = generatedImageUrls.map(url => ({ src: url }));
       setImages(formattedImages);
+      setLastPrompt(prompt);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred.";
       // Try to parse the error message as it might be a JSON string from our API
       try {
         const errorData = JSON.parse(errorMessage);
-        if (errorData?.error?.status === 'RESOURCE_EXHAUSTED') {
-          setError("You've exceeded your current API quota.");
-          setIsQuotaError(true);
+        if (errorData?.error?.message) {
+            // Handle nested error structures from Google API
+            try {
+                const nestedError = JSON.parse(errorData.error.message);
+                 if (nestedError?.error?.status === 'RESOURCE_EXHAUSTED' || nestedError?.error?.message?.includes('quota')) {
+                    setError("You've exceeded your current API quota.");
+                    setIsQuotaError(true);
+                } else {
+                    setError(`Failed to generate image: ${nestedError?.error?.message || errorData.message}`);
+                }
+            } catch (e) {
+                 if (errorData?.error?.status === 'RESOURCE_EXHAUSTED') {
+                    setError("You've exceeded your current API quota.");
+                    setIsQuotaError(true);
+                 } else {
+                    setError(`Failed to generate image: ${errorData.message}`);
+                 }
+            }
+        } else if (errorData?.message) {
+             setError(`Failed to generate image: ${errorData.message}`);
         } else {
-           // Use the message from the parsed JSON if available, otherwise default to the raw message
-          setError(`Failed to generate image: ${errorData?.message || errorMessage}`);
+             setError(`Failed to generate image: ${errorMessage}`);
         }
       } catch (parseError) {
         // If it's not JSON, just show the raw message
@@ -58,11 +77,9 @@ function App() {
     <div className="min-h-screen text-gray-800 dark:text-gray-100 flex flex-col items-center font-sans p-4 sm:p-6">
       <div className="w-full max-w-4xl" aria-busy={isLoading}>
         <Header />
-        <main className="mt-8">
+        <main className="mt-8 space-y-12">
           <PromptInput onGenerate={handleGenerate} isLoading={isLoading} isApiKeySet={!!apiKey} />
-          <div className="mt-12">
-            <ImageDisplay images={images} isLoading={isLoading} error={error} isQuotaError={isQuotaError} />
-          </div>
+          <ImageDisplay images={images} isLoading={isLoading} error={error} isQuotaError={isQuotaError} prompt={lastPrompt} />
         </main>
       </div>
     </div>

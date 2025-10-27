@@ -2,21 +2,26 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M10 10 L30 90 L50 30 L70 90 L90 10' stroke='%23A855F7' fill='none' stroke-width='12' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23A855F7'/%3E%3Cstop offset='50%25' stop-color='%23EC4899'/%3E%3Cstop offset='100%25' stop-color='%23EF4444'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M10 90 L10 10 L50 10 L50 50 L90 50 L90 90 L10 90 M50 50 L50 90' stroke='url(%23g)' fill='none' stroke-width='12' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" sizes="any" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WesAI Image Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       // This is crucial for enabling the class-based dark mode that our ThemeContext controls.
       tailwind.config = {
         darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+          },
+        },
       }
     </script>
-    <style>
-      body {
-        /* Base styles are applied here, theme-specific bg is handled by the theme provider */
-      }
-    </style>
   <script type="importmap">
 {
   "imports": {
@@ -28,7 +33,7 @@
 }
 </script>
 </head>
-  <body class="bg-white dark:bg-gray-900 transition-colors duration-300">
+  <body class="transition-colors duration-300">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>
