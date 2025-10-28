@@ -2,7 +2,7 @@
 
 A powerful and intuitive web application for generating high-quality images from text prompts using Google's state-of-the-art AI models. This tool is designed for creatives, marketers, and developers to bring their ideas to life visually.
 
-![WesAI Image Generator UI Screenshot](https://storage.googleapis.com/aistudio-o-prd-public/assets/marketing/preview-light.png)
+<img width="1070" height="987" alt="image" src="https://github.com/user-attachments/assets/42709973-c262-44c3-be28-c51ffc5a5b5c" />
 
 ---
 
