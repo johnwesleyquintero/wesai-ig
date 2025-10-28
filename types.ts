@@ -6,3 +6,5 @@ export interface GeneratedImage {
 }
 
 export type GenerationModel = 'gemini' | 'huggingface';
+
+export type AspectRatio = '1:1' | '3:4' | '16:9';

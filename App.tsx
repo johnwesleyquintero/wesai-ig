@@ -7,7 +7,7 @@ import HelpModal from './components/HelpModal';
 import { generateImageWithGemini } from './services/geminiService';
 import { generateImageWithHuggingFace } from './services/clientService';
 import { ApiKeyContext } from './contexts/ApiKeyContext';
-import type { GeneratedImage, GenerationModel } from './types';
+import type { GeneratedImage, GenerationModel, AspectRatio } from './types';
 import { InfoIcon } from './components/Icons';
 
 function App() {
@@ -32,7 +32,7 @@ function App() {
     }
   }, []);
 
-  const handleGenerate = useCallback(async (prompt: string, model: GenerationModel) => {
+  const handleGenerate = useCallback(async (prompt: string, model: GenerationModel, aspectRatio: AspectRatio) => {
     const activeApiKey = model === 'gemini' ? geminiApiKey : huggingFaceApiKey;
     if (!activeApiKey) {
       setError(`API Key for ${model === 'gemini' ? 'Google Gemini' : 'Hugging Face'} is not set.`);
@@ -48,7 +48,7 @@ function App() {
       let imageUrl;
       if (model === 'gemini') {
         try {
-          imageUrl = await generateImageWithGemini(prompt, geminiApiKey!);
+          imageUrl = await generateImageWithGemini(prompt, geminiApiKey!, aspectRatio);
         } catch (geminiErr) {
           // Smart Failover: If Gemini fails with a quota error and HF key exists, try HF.
           const isGeminiQuotaError = geminiErr instanceof Error && (geminiErr.message.includes('quota') || geminiErr.message.includes('billing'));
@@ -89,6 +89,16 @@ function App() {
     });
   };
 
+  const handleSaveEditedImage = (originalPrompt: string, editPrompt: string, editedSrc: string) => {
+    setImages(prevImages => {
+      const newPrompt = `Edit: "${editPrompt}" -- (Original: ${originalPrompt})`;
+      const newImage: GeneratedImage = { id: Date.now().toString(), src: editedSrc, prompt: newPrompt };
+      const updatedImages = [newImage, ...prevImages];
+      localStorage.setItem('wesai_image_library', JSON.stringify(updatedImages));
+      return updatedImages;
+    });
+  };
+
   return (
     <div className="min-h-screen text-slate-800 dark:text-slate-200 flex flex-col items-center font-sans p-4 sm:p-6">
       <div className="w-full max-w-4xl" aria-busy={isLoading}>
@@ -115,6 +125,7 @@ function App() {
             error={error} 
             isQuotaError={isQuotaError}
             onDeleteImage={handleDeleteImage}
+            onSaveEditedImage={handleSaveEditedImage}
           />
         </main>
         {isSettingsOpen && <SettingsModal onClose={() => setIsSettingsOpen(false)} />}

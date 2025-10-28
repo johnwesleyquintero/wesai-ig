@@ -2,11 +2,12 @@ import React, { useState, useContext } from 'react';
 import Spinner from './Spinner';
 import SamplePrompts from './SamplePrompts';
 import ModelSelector from './ModelSelector';
+import AspectRatioSelector from './AspectRatioSelector';
 import { ApiKeyContext } from '../contexts/ApiKeyContext';
-import { GenerationModel } from '../types';
+import { GenerationModel, AspectRatio } from '../types';
 
 interface PromptInputProps {
-  onGenerate: (prompt: string, model: GenerationModel) => void;
+  onGenerate: (prompt: string, model: GenerationModel, aspectRatio: AspectRatio) => void;
   isLoading: boolean;
 }
 
@@ -20,14 +21,16 @@ const samplePrompts = [
 const PromptInput: React.FC<PromptInputProps> = ({ onGenerate, isLoading }) => {
   const [prompt, setPrompt] = useState<string>('');
   const [selectedModel, setSelectedModel] = useState<GenerationModel>('gemini');
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState<AspectRatio>('1:1');
   const { geminiApiKey, huggingFaceApiKey } = useContext(ApiKeyContext);
 
   const isApiKeySet = selectedModel === 'gemini' ? !!geminiApiKey : !!huggingFaceApiKey;
+  const isAspectRatioDisabled = selectedModel !== 'gemini';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLoading && isApiKeySet) {
-      onGenerate(prompt, selectedModel);
+      onGenerate(prompt, selectedModel, selectedAspectRatio);
     }
   };
   
@@ -59,7 +62,14 @@ const PromptInput: React.FC<PromptInputProps> = ({ onGenerate, isLoading }) => {
       <SamplePrompts prompts={samplePrompts} onSelect={handleSelectSample} />
       
       <div className="w-full flex flex-col items-center gap-4">
-        <ModelSelector selectedModel={selectedModel} onModelChange={setSelectedModel} />
+        <div className="w-full flex flex-col sm:flex-row items-center justify-center gap-4">
+            <ModelSelector selectedModel={selectedModel} onModelChange={setSelectedModel} />
+            <AspectRatioSelector 
+                selectedRatio={selectedAspectRatio} 
+                onRatioChange={setSelectedAspectRatio} 
+                isDisabled={isAspectRatioDisabled} 
+            />
+        </div>
         <button
           type="submit"
           disabled={isLoading || !prompt.trim() || !isApiKeySet}

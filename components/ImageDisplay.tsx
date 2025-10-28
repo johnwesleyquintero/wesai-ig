@@ -4,7 +4,9 @@ import useMockup from '../hooks/useMockup';
 import Spinner from './Spinner';
 import ErrorAlert from './ErrorAlert';
 import MockupDisplay from './MockupDisplay';
-import { CopyIcon, DownloadIcon, ImageIcon, TrashIcon } from './Icons';
+import PreviewModal from './PreviewModal';
+import CanvasModal from './CanvasModal';
+import { CopyIcon, DownloadIcon, ImageIcon, TrashIcon, EditIcon } from './Icons';
 
 interface ImageDisplayProps {
   images: GeneratedImage[];
@@ -12,12 +14,15 @@ interface ImageDisplayProps {
   error: string | null;
   isQuotaError: boolean;
   onDeleteImage: (id: string) => void;
+  onSaveEditedImage: (originalPrompt: string, editPrompt: string, editedSrc: string) => void;
 }
 
-const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, isQuotaError, onDeleteImage }) => {
+const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, isQuotaError, onDeleteImage, onSaveEditedImage }) => {
   const [latestImage, ...historyImages] = images;
   const { mockupSrc, isCreatingMockup, createMockup } = useMockup(latestImage ? latestImage.src : null);
   const [copied, setCopied] = React.useState(false);
+  const [previewImage, setPreviewImage] = React.useState<GeneratedImage | null>(null);
+  const [editingImage, setEditingImage] = React.useState<GeneratedImage | null>(null);
 
   const handleCopyPrompt = () => {
       if (latestImage) {
@@ -27,6 +32,11 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
       }
   };
   
+  const handleDelete = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation(); // Prevent the preview modal from opening when deleting
+    onDeleteImage(id);
+  };
+
   return (
     <div aria-live="polite">
       {isLoading && (
@@ -57,6 +67,13 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
                         <button onClick={handleCopyPrompt} className="w-full sm:w-auto flex items-center justify-center px-4 py-2 text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-md hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors duration-200">
                             <CopyIcon />
                             <span className="ml-2">{copied ? 'Copied!' : 'Copy Prompt'}</span>
+                        </button>
+                        <button 
+                            onClick={() => setEditingImage(latestImage)}
+                            className="w-full sm:w-auto flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700 transition-colors duration-200"
+                        >
+                            <EditIcon />
+                            <span>Edit Image</span>
                         </button>
                         <a
                            href={latestImage.src}
@@ -101,23 +118,28 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {historyImages.map((image) => (
-                  <div key={image.id} className="group relative rounded-lg overflow-hidden shadow-md aspect-square bg-slate-100 dark:bg-slate-800">
+                  <button
+                    key={image.id}
+                    onClick={() => setPreviewImage(image)}
+                    className="group relative rounded-lg overflow-hidden shadow-md aspect-square bg-slate-100 dark:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-pink-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+                    aria-label="Preview image"
+                  >
                     <img
                       src={image.src}
-                      alt={`Generated image for prompt: ${image.prompt}`}
+                      alt={image.prompt}
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-2">
                       <p className="text-white text-xs text-center line-clamp-4">{image.prompt}</p>
                     </div>
                      <button
-                        onClick={() => onDeleteImage(image.id)}
-                        className="absolute top-2 right-2 p-1.5 bg-black/60 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-500 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-500"
+                        onClick={(e) => handleDelete(e, image.id)}
+                        className="absolute top-2 right-2 p-1.5 bg-black/60 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-500 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-500 z-10"
                         aria-label="Delete image"
                       >
                         <TrashIcon />
                       </button>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
@@ -131,6 +153,18 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
           <p className="mt-4 text-lg font-medium text-slate-600 dark:text-slate-400">Your masterpiece awaits.</p>
           <p className="text-slate-500 text-sm mt-1">Enter a prompt above and let your imagination take flight.</p>
         </div>
+      )}
+
+      {previewImage && (
+        <PreviewModal image={previewImage} onClose={() => setPreviewImage(null)} />
+      )}
+
+      {editingImage && (
+        <CanvasModal 
+            image={editingImage} 
+            onClose={() => setEditingImage(null)}
+            onSave={onSaveEditedImage}
+        />
       )}
     </div>
   );
