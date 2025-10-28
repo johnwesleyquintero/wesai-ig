@@ -4,16 +4,17 @@ import useMockup from '../hooks/useMockup';
 import Spinner from './Spinner';
 import ErrorAlert from './ErrorAlert';
 import MockupDisplay from './MockupDisplay';
-import { CopyIcon, DownloadIcon, ImageIcon } from './Icons';
+import { CopyIcon, DownloadIcon, ImageIcon, TrashIcon } from './Icons';
 
 interface ImageDisplayProps {
   images: GeneratedImage[];
   isLoading: boolean;
   error: string | null;
   isQuotaError: boolean;
+  onDeleteImage: (id: string) => void;
 }
 
-const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, isQuotaError }) => {
+const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, isQuotaError, onDeleteImage }) => {
   const [latestImage, ...historyImages] = images;
   const { mockupSrc, isCreatingMockup, createMockup } = useMockup(latestImage ? latestImage.src : null);
   const [copied, setCopied] = React.useState(false);
@@ -26,7 +27,6 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
       }
   };
   
-  // This wrapper will announce content changes to screen readers
   return (
     <div aria-live="polite">
       {isLoading && (
@@ -42,7 +42,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
       {!isLoading && !error && latestImage && (
         <div className="space-y-12">
           {/* Original Image Display */}
-          <div key={latestImage.src} className="animate-fade-in-scale">
+          <div key={latestImage.id} className="animate-fade-in-scale">
             <div className="mb-4 border-b-2 border-slate-200 dark:border-slate-700 pb-2">
                 <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-slate-100">Latest Image</h2>
             </div>
@@ -93,15 +93,15 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
               {mockupSrc && <MockupDisplay mockupSrc={mockupSrc} />}
           </div>
 
-          {/* Session History */}
+          {/* Image Library */}
           {historyImages.length > 0 && (
             <div className="mt-16">
               <div className="mb-4 border-b-2 border-slate-200 dark:border-slate-700 pb-2">
-                <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-slate-100">Session History</h2>
+                <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-slate-100">Image Library</h2>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {historyImages.map((image) => (
-                  <div key={image.src} className="group relative rounded-lg overflow-hidden shadow-md aspect-square bg-slate-100 dark:bg-slate-800">
+                  <div key={image.id} className="group relative rounded-lg overflow-hidden shadow-md aspect-square bg-slate-100 dark:bg-slate-800">
                     <img
                       src={image.src}
                       alt={`Generated image for prompt: ${image.prompt}`}
@@ -110,6 +110,13 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
                     <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-2">
                       <p className="text-white text-xs text-center line-clamp-4">{image.prompt}</p>
                     </div>
+                     <button
+                        onClick={() => onDeleteImage(image.id)}
+                        className="absolute top-2 right-2 p-1.5 bg-black/60 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-500 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-500"
+                        aria-label="Delete image"
+                      >
+                        <TrashIcon />
+                      </button>
                   </div>
                 ))}
               </div>

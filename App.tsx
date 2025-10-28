@@ -3,6 +3,7 @@ import Header from './components/Header';
 import PromptInput from './components/PromptInput';
 import ImageDisplay from './components/ImageDisplay';
 import SettingsModal from './components/SettingsModal';
+import HelpModal from './components/HelpModal';
 import { generateImage } from './services/clientService';
 import { ApiKeyContext } from './contexts/ApiKeyContext';
 import type { GeneratedImage } from './types';
@@ -14,7 +15,21 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [isQuotaError, setIsQuotaError] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const { apiKey, isLoading: isKeyLoading } = useContext(ApiKeyContext);
+
+  // Load images from localStorage on initial render
+  useEffect(() => {
+    try {
+      const storedImages = localStorage.getItem('wesai_image_library');
+      if (storedImages) {
+        setImages(JSON.parse(storedImages));
+      }
+    } catch (e) {
+      console.error("Failed to parse images from localStorage", e);
+      localStorage.removeItem('wesai_image_library'); // Clear corrupted data
+    }
+  }, []);
 
   const handleGenerate = useCallback(async (prompt: string) => {
     if (!apiKey) {
@@ -29,7 +44,12 @@ function App() {
 
     try {
       const imageUrl = await generateImage(prompt, apiKey);
-      setImages(prevImages => [{ src: imageUrl, prompt }, ...prevImages]);
+      setImages(prevImages => {
+        const newImage: GeneratedImage = { id: Date.now().toString(), src: imageUrl, prompt };
+        const updatedImages = [newImage, ...prevImages];
+        localStorage.setItem('wesai_image_library', JSON.stringify(updatedImages));
+        return updatedImages;
+      });
     } catch (err) {
       const message = err instanceof Error ? err.message : "An unknown error occurred.";
       if (message.includes("quota")) {
@@ -42,10 +62,21 @@ function App() {
     }
   }, [apiKey]);
 
+  const handleDeleteImage = (idToDelete: string) => {
+    setImages(prevImages => {
+      const updatedImages = prevImages.filter(img => img.id !== idToDelete);
+      localStorage.setItem('wesai_image_library', JSON.stringify(updatedImages));
+      return updatedImages;
+    });
+  };
+
   return (
     <div className="min-h-screen text-slate-800 dark:text-slate-200 flex flex-col items-center font-sans p-4 sm:p-6">
       <div className="w-full max-w-4xl" aria-busy={isLoading}>
-        <Header onSettingsClick={() => setIsSettingsOpen(true)} />
+        <Header 
+          onSettingsClick={() => setIsSettingsOpen(true)} 
+          onHelpClick={() => setIsHelpOpen(true)}
+        />
         <main className="mt-8 space-y-8">
           {!isKeyLoading && !apiKey && (
             <div className="bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600/50 text-amber-800 dark:text-amber-200 px-4 py-3 rounded-lg flex items-center justify-between shadow-sm" role="alert">
@@ -64,9 +95,11 @@ function App() {
             isLoading={isLoading} 
             error={error} 
             isQuotaError={isQuotaError}
+            onDeleteImage={handleDeleteImage}
           />
         </main>
         {isSettingsOpen && <SettingsModal onClose={() => setIsSettingsOpen(false)} />}
+        {isHelpOpen && <HelpModal onClose={() => setIsHelpOpen(false)} />} 
       </div>
     </div>
   );
