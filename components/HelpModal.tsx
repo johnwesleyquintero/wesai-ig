@@ -61,9 +61,6 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                         <li>
                             <span className="font-semibold">Expanded Model Selection:</span> You can now choose between Google Gemini, Stability AI, and Hugging Face to find the perfect style for your vision.
                         </li>
-                         <li>
-                            <span className="font-semibold">Aspect Ratios for Stability AI:</span> Like Gemini, the Stability AI model supports different aspect ratios (Square, Portrait, Landscape).
-                        </li>
                         <li>
                            <span className="font-semibold">Smart Failover 2.0:</span> If Gemini runs into a quota limit, the app will automatically try again with Stability AI to keep you creating.
                         </li>

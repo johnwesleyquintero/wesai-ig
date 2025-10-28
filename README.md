@@ -10,7 +10,7 @@ A simple and elegant web application to generate images from text prompts using 
 
 - **Tri-Provider AI Engine**: Choose between Google's `imagen-4.0`, Stability AI's `Stable Diffusion XL`, or Hugging Face's `stable-diffusion-xl-base-1.0`.
 - **Smart Failover**: If the primary model (Gemini) hits a quota limit, the app automatically switches to a fallback provider (Stability AI) to ensure uninterrupted creativity.
-- **Aspect Ratio Control**: Generate images in square (1:1), portrait (3:4), or landscape (16:9) formats with Gemini and Stability AI.
+- **Aspect Ratio Control**: Generate images in square (1:1), portrait (3:4), or landscape (16:9) formats with the Gemini model.
 - **Persistent Image Library**: All your generated images are saved in your browser's local storage. Review, download, or delete your creations at any time.
 - **Client-Side Focused**: Runs directly in the browser, making it easy to deploy on any static hosting platform.
 - **Multi-API Key Management**: A clean, tabbed settings modal allows you to securely save your Google, Stability AI, and Hugging Face API keys.

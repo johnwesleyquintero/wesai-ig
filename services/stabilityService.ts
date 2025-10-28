@@ -4,16 +4,18 @@ const STABILITY_API_URL = "https://clipdrop-api.co/text-to-image/v1";
 
 /**
  * Generates an image by calling the Stability AI (ClipDrop) API.
+ * This API currently only supports 1:1 aspect ratio images.
  * @param prompt The text prompt to generate an image from.
  * @param apiKey The Stability AI API key.
- * @param aspectRatio The desired aspect ratio for the image.
+ * @param aspectRatio The desired aspect ratio for the image (Note: this is ignored by the API).
  * @returns A promise that resolves to a data URL of the generated image.
  */
 export async function generateImageWithStabilityAI(prompt: string, apiKey: string, aspectRatio: AspectRatio): Promise<string> {
   try {
     const formData = new FormData();
     formData.append('prompt', prompt);
-    formData.append('aspect_ratio', aspectRatio);
+    // Note: The ClipDrop API for text-to-image does not support the 'aspect_ratio' parameter.
+    // It is omitted from the request to prevent errors. All generated images will be 1:1.
 
     const response = await fetch(STABILITY_API_URL, {
       method: 'POST',

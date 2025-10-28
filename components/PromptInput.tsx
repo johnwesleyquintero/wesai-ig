@@ -29,7 +29,7 @@ const PromptInput: React.FC<PromptInputProps> = ({ onGenerate, isLoading }) => {
   else if (selectedModel === 'huggingface') isApiKeySet = !!huggingFaceApiKey;
   else if (selectedModel === 'stabilityai') isApiKeySet = !!stabilityApiKey;
 
-  const isAspectRatioDisabled = selectedModel === 'huggingface';
+  const isAspectRatioDisabled = selectedModel === 'huggingface' || selectedModel === 'stabilityai';
 
   // Reset aspect ratio if it becomes disabled
   React.useEffect(() => {
