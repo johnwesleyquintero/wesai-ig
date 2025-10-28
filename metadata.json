@@ -1,5 +1,5 @@
 {
   "name": "WesAI Image Generator",
-  "description": "WesAI Image Generator is a web application to generate images from text prompts using Hugging Face's stabilityai/stable-diffusion-xl-base-1.0 model. Enter a descriptive prompt, and the AI will create a visual representation.",
+  "description": "WesAI Image Generator is a web application to generate images from text prompts using Google Gemini, Stability AI, and Hugging Face models. Enter a descriptive prompt, and the AI will create a visual representation.",
   "requestFramePermissions": []
 }

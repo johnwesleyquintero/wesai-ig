@@ -22,15 +22,26 @@ const PromptInput: React.FC<PromptInputProps> = ({ onGenerate, isLoading }) => {
   const [prompt, setPrompt] = useState<string>('');
   const [selectedModel, setSelectedModel] = useState<GenerationModel>('gemini');
   const [selectedAspectRatio, setSelectedAspectRatio] = useState<AspectRatio>('1:1');
-  const { geminiApiKey, huggingFaceApiKey } = useContext(ApiKeyContext);
+  const { geminiApiKey, huggingFaceApiKey, stabilityApiKey } = useContext(ApiKeyContext);
 
-  const isApiKeySet = selectedModel === 'gemini' ? !!geminiApiKey : !!huggingFaceApiKey;
-  const isAspectRatioDisabled = selectedModel !== 'gemini';
+  let isApiKeySet = false;
+  if (selectedModel === 'gemini') isApiKeySet = !!geminiApiKey;
+  else if (selectedModel === 'huggingface') isApiKeySet = !!huggingFaceApiKey;
+  else if (selectedModel === 'stabilityai') isApiKeySet = !!stabilityApiKey;
+
+  const isAspectRatioDisabled = selectedModel === 'huggingface';
+
+  // Reset aspect ratio if it becomes disabled
+  React.useEffect(() => {
+    if (isAspectRatioDisabled) {
+      setSelectedAspectRatio('1:1');
+    }
+  }, [isAspectRatioDisabled]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLoading && isApiKeySet) {
-      onGenerate(prompt, selectedModel, selectedAspectRatio);
+      onGenerate(prompt, selectedModel, isAspectRatioDisabled ? '1:1' : selectedAspectRatio);
     }
   };
   
@@ -39,11 +50,16 @@ const PromptInput: React.FC<PromptInputProps> = ({ onGenerate, isLoading }) => {
   };
 
   const getPlaceholderText = () => {
-    if (!geminiApiKey && !huggingFaceApiKey) {
+    if (!geminiApiKey && !huggingFaceApiKey && !stabilityApiKey) {
       return "Please set an API key in the settings to start...";
     }
     if (!isApiKeySet) {
-      return `Please set your ${selectedModel === 'gemini' ? 'Google Gemini' : 'Hugging Face'} key in settings...`;
+      const modelName = {
+        gemini: 'Google Gemini',
+        huggingface: 'Hugging Face',
+        stabilityai: 'Stability AI'
+      }[selectedModel];
+      return `Please set your ${modelName} key in settings...`;
     }
     return "e.g., A majestic lion wearing a crown, studio lighting...";
   };
@@ -55,7 +71,7 @@ const PromptInput: React.FC<PromptInputProps> = ({ onGenerate, isLoading }) => {
         onChange={(e) => setPrompt(e.target.value)}
         placeholder={getPlaceholderText()}
         className="w-full h-28 p-4 bg-white border border-slate-300 text-slate-900 placeholder-slate-400 rounded-lg shadow-inner focus:ring-2 focus:ring-pink-500 focus:outline-none resize-none transition-colors duration-200 ease-in-out dark:bg-slate-800 dark:border-slate-600 dark:text-slate-50 dark:placeholder-slate-500"
-        disabled={isLoading || (!geminiApiKey && !huggingFaceApiKey)}
+        disabled={isLoading || (!geminiApiKey && !huggingFaceApiKey && !stabilityApiKey)}
         aria-label="Image generation prompt"
       />
       

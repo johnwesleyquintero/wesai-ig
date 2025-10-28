@@ -25,7 +25,7 @@ const AspectRatioSelector: React.FC<AspectRatioSelectorProps> = ({ selectedRatio
   return (
     <div 
         className={`w-full max-w-xs mx-auto transition-opacity duration-300 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-        title={isDisabled ? "Aspect ratio is only available for the Gemini model." : "Select aspect ratio"}
+        title={isDisabled ? "Aspect ratio is only available for Gemini & Stability AI." : "Select aspect ratio"}
     >
         <div className="p-1 bg-slate-100 dark:bg-slate-800 rounded-lg flex space-x-1">
             {ratios.map(({ value, label }) => (

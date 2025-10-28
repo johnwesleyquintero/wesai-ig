@@ -6,6 +6,7 @@ import SettingsModal from './components/SettingsModal';
 import HelpModal from './components/HelpModal';
 import { generateImageWithGemini } from './services/geminiService';
 import { generateImageWithHuggingFace } from './services/clientService';
+import { generateImageWithStabilityAI } from './services/stabilityService';
 import { ApiKeyContext } from './contexts/ApiKeyContext';
 import type { GeneratedImage, GenerationModel, AspectRatio } from './types';
 import { InfoIcon } from './components/Icons';
@@ -17,7 +18,7 @@ function App() {
   const [isQuotaError, setIsQuotaError] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
-  const { geminiApiKey, huggingFaceApiKey, isKeyLoading } = useContext(ApiKeyContext);
+  const { geminiApiKey, huggingFaceApiKey, stabilityApiKey, isKeyLoading } = useContext(ApiKeyContext);
 
   // Load images from localStorage on initial render
   useEffect(() => {
@@ -33,9 +34,13 @@ function App() {
   }, []);
 
   const handleGenerate = useCallback(async (prompt: string, model: GenerationModel, aspectRatio: AspectRatio) => {
-    const activeApiKey = model === 'gemini' ? geminiApiKey : huggingFaceApiKey;
+    let activeApiKey: string | null = null;
+    if (model === 'gemini') activeApiKey = geminiApiKey;
+    if (model === 'huggingface') activeApiKey = huggingFaceApiKey;
+    if (model === 'stabilityai') activeApiKey = stabilityApiKey;
+    
     if (!activeApiKey) {
-      setError(`API Key for ${model === 'gemini' ? 'Google Gemini' : 'Hugging Face'} is not set.`);
+      setError(`API Key for ${model} is not set.`);
       setIsSettingsOpen(true);
       return;
     }
@@ -50,16 +55,19 @@ function App() {
         try {
           imageUrl = await generateImageWithGemini(prompt, geminiApiKey!, aspectRatio);
         } catch (geminiErr) {
-          // Smart Failover: If Gemini fails with a quota error and HF key exists, try HF.
+          // Smart Failover: If Gemini fails, try Stability AI if key exists.
           const isGeminiQuotaError = geminiErr instanceof Error && (geminiErr.message.includes('quota') || geminiErr.message.includes('billing'));
-          if (isGeminiQuotaError && huggingFaceApiKey) {
-            console.log("Gemini quota error, attempting fallback to Hugging Face...");
-            imageUrl = await generateImageWithHuggingFace(prompt, huggingFaceApiKey);
+          if (isGeminiQuotaError && stabilityApiKey) {
+            console.log("Gemini quota error, attempting fallback to Stability AI...");
+            imageUrl = await generateImageWithStabilityAI(prompt, stabilityApiKey, aspectRatio);
           } else {
             throw geminiErr; // Re-throw other Gemini errors
           }
         }
-      } else {
+      } else if (model === 'stabilityai') {
+        imageUrl = await generateImageWithStabilityAI(prompt, stabilityApiKey!, aspectRatio);
+      }
+      else {
         imageUrl = await generateImageWithHuggingFace(prompt, huggingFaceApiKey!);
       }
 
@@ -85,7 +93,7 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [geminiApiKey, huggingFaceApiKey]);
+  }, [geminiApiKey, huggingFaceApiKey, stabilityApiKey]);
 
   const handleDeleteImage = (idToDelete: string) => {
     setImages(prevImages => {
@@ -113,7 +121,7 @@ function App() {
           onHelpClick={() => setIsHelpOpen(true)}
         />
         <main className="mt-8 space-y-8">
-          {!isKeyLoading && !geminiApiKey && !huggingFaceApiKey && (
+          {!isKeyLoading && !geminiApiKey && !huggingFaceApiKey && !stabilityApiKey && (
             <div className="bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600/50 text-amber-800 dark:text-amber-200 px-4 py-3 rounded-lg flex items-center justify-between shadow-sm" role="alert">
               <div className="flex items-center">
                 <InfoIcon />

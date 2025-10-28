@@ -21,6 +21,11 @@ const providerDetails = {
         name: 'Hugging Face',
         placeholder: 'hf_...',
         docsUrl: 'https://huggingface.co/settings/tokens',
+    },
+    stabilityai: {
+        name: 'Stability AI (ClipDrop)',
+        placeholder: 'Enter your ClipDrop API Key...',
+        docsUrl: 'https://clipdrop.co/apis',
     }
 }
 

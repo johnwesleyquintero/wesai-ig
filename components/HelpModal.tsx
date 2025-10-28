@@ -53,19 +53,19 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
         <div className="mt-4 space-y-4 text-slate-700 dark:text-slate-300 overflow-y-auto max-h-[60vh]">
             {activeTab === 'whats-new' && (
                 <div className="animate-fade-in-scale">
-                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Major Upgrade: Multi-Provider Engine</h3>
+                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Major Upgrade: Tri-Provider Engine</h3>
                     <ul className="list-disc list-inside space-y-3 mt-2">
                         <li>
-                            <span className="font-semibold">Powered by Google Gemini:</span> We've integrated Google's powerful Imagen model as the new recommended engine for faster, higher-quality results.
+                            <span className="font-semibold">New Engine: Stability AI:</span> We've added the powerful Stable Diffusion XL model via the ClipDrop API, perfect for artistic and creative image styles.
                         </li>
                         <li>
-                            <span className="font-semibold">Model Selection:</span> You can now choose between Google Gemini and Hugging Face models before generating an image.
-                        </li>
-                        <li>
-                           <span className="font-semibold">Smart Failover:</span> If Gemini runs into a quota limit, the app will automatically try again with Hugging Face to keep you creating.
+                            <span className="font-semibold">Expanded Model Selection:</span> You can now choose between Google Gemini, Stability AI, and Hugging Face to find the perfect style for your vision.
                         </li>
                          <li>
-                            <span className="font-semibold">Persistent Image Library:</span> Your generated images are automatically saved to your browser. You can view your entire history and delete any images you no longer need.
+                            <span className="font-semibold">Aspect Ratios for Stability AI:</span> Like Gemini, the Stability AI model supports different aspect ratios (Square, Portrait, Landscape).
+                        </li>
+                        <li>
+                           <span className="font-semibold">Smart Failover 2.0:</span> If Gemini runs into a quota limit, the app will automatically try again with Stability AI to keep you creating.
                         </li>
                     </ul>
                 </div>
@@ -78,12 +78,13 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                         <p className="text-sm">This app requires API keys to function. They are stored securely in your browser.</p>
                         <ul className="text-sm list-disc list-inside mt-1">
                             <li><span className="font-semibold">Google Gemini:</span> Get your key from <a href="https://ai.google.dev/gemini-api/docs/api-key" target="_blank" rel="noopener noreferrer" className="text-pink-500 hover:underline">Google AI Studio</a>.</li>
+                            <li><span className="font-semibold">Stability AI:</span> Get your key from the <a href="https://clipdrop.co/apis" target="_blank" rel="noopener noreferrer" className="text-pink-500 hover:underline">ClipDrop API dashboard</a>.</li>
                              <li><span className="font-semibold">Hugging Face:</span> Get your key from your <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer" className="text-pink-500 hover:underline">Hugging Face account settings</a>.</li>
                         </ul>
                     </div>
                     <div>
                         <h4 className="font-semibold text-slate-800 dark:text-slate-100">Which model should I use?</h4>
-                        <p className="text-sm">We recommend starting with **Google Gemini** for the best performance and quality. Hugging Face is an excellent fallback option.</p>
+                        <p className="text-sm">We recommend starting with **Google Gemini** for speed and realism. **Stability AI** is excellent for more artistic and stylized images. **Hugging Face** is a solid fallback option.</p>
                     </div>
                     <div>
                         <h4 className="font-semibold text-slate-800 dark:text-slate-100">What is the 'A+ Mockup' feature?</h4>
@@ -91,7 +92,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                     </div>
                      <div>
                         <h4 className="font-semibold text-slate-800 dark:text-slate-100">Is it free to use?</h4>
-                        <p className="text-sm">This application is free. However, image generation consumes credits on your Google and/or Hugging Face accounts. Both services provide generous free tiers for getting started.</p>
+                        <p className="text-sm">This application is free. However, image generation consumes credits on your provider accounts. All three services provide generous free tiers for getting started.</p>
                     </div>
                 </div>
             )}

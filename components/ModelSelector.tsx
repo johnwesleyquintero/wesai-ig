@@ -8,7 +8,7 @@ interface ModelSelectorProps {
 
 const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onModelChange }) => {
   const getButtonClasses = (model: GenerationModel) => {
-    return `w-1/2 px-4 py-2 text-sm font-semibold rounded-md transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 ${
+    return `w-1/3 px-2 py-2 text-sm font-semibold rounded-md transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 ${
       selectedModel === model
         ? 'bg-pink-600 text-white shadow'
         : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600'
@@ -16,15 +16,25 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onModelCha
   };
 
   return (
-    <div className="w-full max-w-xs mx-auto p-1 bg-slate-100 dark:bg-slate-800 rounded-lg flex space-x-1">
+    <div className="w-full max-w-sm mx-auto p-1 bg-slate-100 dark:bg-slate-800 rounded-lg flex space-x-1">
       <button
+        type="button"
         onClick={() => onModelChange('gemini')}
         className={getButtonClasses('gemini')}
         aria-pressed={selectedModel === 'gemini'}
       >
-        Gemini <span className="text-xs font-normal opacity-80">(Recommended)</span>
+        Gemini <span className="text-xs font-normal opacity-80 hidden sm:inline">(Fast)</span>
       </button>
       <button
+        type="button"
+        onClick={() => onModelChange('stabilityai')}
+        className={getButtonClasses('stabilityai')}
+        aria-pressed={selectedModel === 'stabilityai'}
+      >
+        Stability AI <span className="text-xs font-normal opacity-80 hidden sm:inline">(Artistic)</span>
+      </button>
+      <button
+        type="button"
         onClick={() => onModelChange('huggingface')}
         className={getButtonClasses('huggingface')}
         aria-pressed={selectedModel === 'huggingface'}

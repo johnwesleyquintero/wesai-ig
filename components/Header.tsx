@@ -35,7 +35,7 @@ const Header: React.FC<HeaderProps> = ({ onSettingsClick, onHelpClick }) => {
               WesAI Image Generator
             </h1>
             <p className="mt-2 text-base sm:text-lg text-slate-600 dark:text-slate-400">
-              Powered by Google Gemini & Hugging Face
+              Powered by Gemini, Stability AI & Hugging Face
             </p>
         </div>
       </header>

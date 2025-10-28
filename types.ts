@@ -5,6 +5,6 @@ export interface GeneratedImage {
   prompt: string;
 }
 
-export type GenerationModel = 'gemini' | 'huggingface';
+export type GenerationModel = 'gemini' | 'huggingface' | 'stabilityai';
 
 export type AspectRatio = '1:1' | '3:4' | '16:9';

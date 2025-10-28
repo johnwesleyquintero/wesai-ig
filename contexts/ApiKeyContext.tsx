@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { GoogleGenAI } from '@google/genai';
 
 const HF_VALIDATION_MODEL_ID = "google/flan-t5-small";
+const STABILITY_VALIDATION_URL = "https://clipdrop-api.co/text-to-image/v1";
 
 interface ApiKeyContextType {
   geminiApiKey: string | null;
@@ -15,6 +16,12 @@ interface ApiKeyContextType {
   isHfKeyValid: boolean;
   isHfKeyLoading: boolean;
   validateHfKey: (key: string) => void;
+
+  stabilityApiKey: string | null;
+  setStabilityApiKey: (key: string) => void;
+  isStabilityKeyValid: boolean;
+  isStabilityKeyLoading: boolean;
+  validateStabilityKey: (key: string) => void;
 
   isKeyLoading: boolean; // Overall loading status
 }
@@ -32,6 +39,12 @@ export const ApiKeyContext = createContext<ApiKeyContextType>({
   isHfKeyLoading: true,
   validateHfKey: () => {},
   
+  stabilityApiKey: null,
+  setStabilityApiKey: () => {},
+  isStabilityKeyValid: false,
+  isStabilityKeyLoading: true,
+  validateStabilityKey: () => {},
+
   isKeyLoading: true,
 });
 
@@ -43,6 +56,10 @@ export const ApiKeyProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [huggingFaceApiKey, setHuggingFaceApiKeyState] = useState<string | null>(null);
   const [isHfKeyValid, setIsHfKeyValid] = useState<boolean>(false);
   const [isHfKeyLoading, setIsHfKeyLoading] = useState<boolean>(true);
+  
+  const [stabilityApiKey, setStabilityApiKeyState] = useState<string | null>(null);
+  const [isStabilityKeyValid, setIsStabilityKeyValid] = useState<boolean>(false);
+  const [isStabilityKeyLoading, setIsStabilityKeyLoading] = useState<boolean>(true);
 
   const validateGeminiKey = useCallback(async (key: string) => {
     if (!key) {
@@ -53,7 +70,6 @@ export const ApiKeyProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setIsGeminiKeyLoading(true);
     try {
       const ai = new GoogleGenAI({ apiKey: key });
-      // A lightweight call to list models to validate the key.
       await ai.models.list(); 
       setIsGeminiKeyValid(true);
     } catch (error) {
@@ -90,6 +106,36 @@ export const ApiKeyProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setIsHfKeyLoading(false);
     }
   }, []);
+
+  const validateStabilityKey = useCallback(async (key: string) => {
+    if (!key) {
+      setIsStabilityKeyValid(false);
+      setIsStabilityKeyLoading(false);
+      return;
+    }
+    setIsStabilityKeyLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('prompt', 'test');
+      const response = await fetch(STABILITY_VALIDATION_URL, {
+        method: 'POST',
+        headers: { 'x-api-key': key },
+        body: formData,
+      });
+      // A 400 response means the key is valid but the prompt is bad (which is fine for a check).
+      // A 401 means the key is invalid.
+      if (response.status !== 401) {
+        setIsStabilityKeyValid(true);
+      } else {
+        setIsStabilityKeyValid(false);
+      }
+    } catch (error) {
+      console.error("Stability AI API key validation failed:", error);
+      setIsStabilityKeyValid(false);
+    } finally {
+      setIsStabilityKeyLoading(false);
+    }
+  }, []);
   
   useEffect(() => {
     const storedGeminiKey = localStorage.getItem('gemini_api_key');
@@ -107,26 +153,29 @@ export const ApiKeyProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } else {
       setIsHfKeyLoading(false);
     }
-  }, [validateGeminiKey, validateHfKey]);
+
+    const storedStabilityKey = localStorage.getItem('stability_api_key');
+    if (storedStabilityKey) {
+      setStabilityApiKeyState(storedStabilityKey);
+      validateStabilityKey(storedStabilityKey);
+    } else {
+      setIsStabilityKeyLoading(false);
+    }
+  }, [validateGeminiKey, validateHfKey, validateStabilityKey]);
 
   const setGeminiApiKey = (key: string) => {
-    if (key) {
-      localStorage.setItem('gemini_api_key', key);
-      setGeminiApiKeyState(key);
-    } else {
-      localStorage.removeItem('gemini_api_key');
-      setGeminiApiKeyState(null);
-    }
+    localStorage.setItem('gemini_api_key', key);
+    setGeminiApiKeyState(key);
   };
 
   const setHuggingFaceApiKey = (key: string) => {
-    if (key) {
-      localStorage.setItem('hf_api_key', key);
-      setHuggingFaceApiKeyState(key);
-    } else {
-      localStorage.removeItem('hf_api_key');
-      setHuggingFaceApiKeyState(null);
-    }
+    localStorage.setItem('hf_api_key', key);
+    setHuggingFaceApiKeyState(key);
+  };
+  
+  const setStabilityApiKey = (key: string) => {
+    localStorage.setItem('stability_api_key', key);
+    setStabilityApiKeyState(key);
   };
 
   const value = {
@@ -140,7 +189,12 @@ export const ApiKeyProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     isHfKeyValid,
     isHfKeyLoading,
     validateHfKey,
-    isKeyLoading: isGeminiKeyLoading || isHfKeyLoading,
+    stabilityApiKey,
+    setStabilityApiKey,
+    isStabilityKeyValid,
+    isStabilityKeyLoading,
+    validateStabilityKey,
+    isKeyLoading: isGeminiKeyLoading || isHfKeyLoading || isStabilityKeyLoading,
   };
 
   return (
