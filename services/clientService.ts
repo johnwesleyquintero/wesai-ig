@@ -1,5 +1,5 @@
-// This is the recommended model for this task.
-const HF_API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1";
+// This is a widely available and highly reliable model.
+const HF_API_URL = "https://api-inference.huggingface.co/models/CompVis/stable-diffusion-v1-4";
 
 /**
  * Generates an image by calling the Hugging Face Inference API directly from the client.
@@ -28,7 +28,7 @@ export async function generateImage(prompt: string, apiKey: string): Promise<str
         if (response.status === 503) {
              const errorData = await response.json().catch(() => null);
              if (errorData && errorData.error) {
-                // e.g., "Model stabilityai/stable-diffusion-2-1 is currently loading"
+                // e.g., "Model CompVis/stable-diffusion-v1-4 is currently loading"
                 throw new Error(errorData.error);
              }
              // Fallback for 503 if JSON parsing fails

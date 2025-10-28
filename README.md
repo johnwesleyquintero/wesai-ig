@@ -1,6 +1,6 @@
 # WesAI Image Generator
 
-A simple and elegant web application to generate images from text prompts using Hugging Face's Stable Diffusion model. Enter a descriptive prompt, and the AI will create a visual representation. This project is designed to be straightforward to set up and run entirely on the client-side.
+A simple and elegant web application to generate images from text prompts using Hugging Face's `CompVis/stable-diffusion-v1-4` model. Enter a descriptive prompt, and the AI will create a visual representation. This project is designed to be straightforward to set up and run entirely on the client-side.
 
 <img width="1070" height="987" alt="image" src="https://github.com/user-attachments/assets/42709973-c262-44c3-be28-c51ffc5a5b5c" />
 
@@ -8,7 +8,7 @@ A simple and elegant web application to generate images from text prompts using 
 
 ## ✨ Features
 
-- **AI-Powered Image Generation**: Leverages the Hugging Face Inference API with a Stable Diffusion model to create images from text.
+- **AI-Powered Image Generation**: Leverages the Hugging Face Inference API with the `CompVis/stable-diffusion-v1-4` model to create images from text.
 - **Client-Side Focused**: Runs directly in the browser, making it easy to deploy on any static hosting platform.
 - **API Key Management**: A simple settings modal allows you to securely save your Hugging Face API key in your browser's local storage.
 - **A+ Content Mockup**: Automatically generate an e-commerce-ready "A+ Content" mockup from your generated image, ideal for product listings.
