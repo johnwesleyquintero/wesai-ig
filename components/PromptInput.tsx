@@ -1,10 +1,12 @@
 import React, { useState, useContext } from 'react';
 import Spinner from './Spinner';
 import SamplePrompts from './SamplePrompts';
+import ModelSelector from './ModelSelector';
 import { ApiKeyContext } from '../contexts/ApiKeyContext';
+import { GenerationModel } from '../types';
 
 interface PromptInputProps {
-  onGenerate: (prompt: string) => void;
+  onGenerate: (prompt: string, model: GenerationModel) => void;
   isLoading: boolean;
 }
 
@@ -17,12 +19,15 @@ const samplePrompts = [
 
 const PromptInput: React.FC<PromptInputProps> = ({ onGenerate, isLoading }) => {
   const [prompt, setPrompt] = useState<string>('');
-  const { apiKey } = useContext(ApiKeyContext);
+  const [selectedModel, setSelectedModel] = useState<GenerationModel>('gemini');
+  const { geminiApiKey, huggingFaceApiKey } = useContext(ApiKeyContext);
+
+  const isApiKeySet = selectedModel === 'gemini' ? !!geminiApiKey : !!huggingFaceApiKey;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLoading && apiKey) {
-      onGenerate(prompt);
+    if (!isLoading && isApiKeySet) {
+      onGenerate(prompt, selectedModel);
     }
   };
   
@@ -30,37 +35,46 @@ const PromptInput: React.FC<PromptInputProps> = ({ onGenerate, isLoading }) => {
     setPrompt(sample);
   };
 
-  const placeholderText = !apiKey 
-    ? "Please set your Hugging Face API key in the settings..." 
-    : "e.g., A majestic lion wearing a crown, studio lighting...";
+  const getPlaceholderText = () => {
+    if (!geminiApiKey && !huggingFaceApiKey) {
+      return "Please set an API key in the settings to start...";
+    }
+    if (!isApiKeySet) {
+      return `Please set your ${selectedModel === 'gemini' ? 'Google Gemini' : 'Hugging Face'} key in settings...`;
+    }
+    return "e.g., A majestic lion wearing a crown, studio lighting...";
+  };
 
   return (
     <form onSubmit={handleSubmit} className="w-full flex flex-col items-center gap-6">
       <textarea
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
-        placeholder={placeholderText}
+        placeholder={getPlaceholderText()}
         className="w-full h-28 p-4 bg-white border border-slate-300 text-slate-900 placeholder-slate-400 rounded-lg shadow-inner focus:ring-2 focus:ring-pink-500 focus:outline-none resize-none transition-colors duration-200 ease-in-out dark:bg-slate-800 dark:border-slate-600 dark:text-slate-50 dark:placeholder-slate-500"
-        disabled={isLoading || !apiKey}
+        disabled={isLoading || (!geminiApiKey && !huggingFaceApiKey)}
         aria-label="Image generation prompt"
       />
       
       <SamplePrompts prompts={samplePrompts} onSelect={handleSelectSample} />
       
-      <button
-        type="submit"
-        disabled={isLoading || !prompt.trim() || !apiKey}
-        className="w-full sm:w-auto px-8 py-3 flex items-center justify-center font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg shadow-md hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 dark:focus:ring-purple-800"
-      >
-        {isLoading ? (
-          <>
-            <Spinner />
-            <span className="ml-2">Generating...</span>
-          </>
-        ) : (
-          'Generate Image'
-        )}
-      </button>
+      <div className="w-full flex flex-col items-center gap-4">
+        <ModelSelector selectedModel={selectedModel} onModelChange={setSelectedModel} />
+        <button
+          type="submit"
+          disabled={isLoading || !prompt.trim() || !isApiKeySet}
+          className="w-full sm:w-auto px-8 py-3 flex items-center justify-center font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg shadow-md hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 dark:focus:ring-purple-800"
+        >
+          {isLoading ? (
+            <>
+              <Spinner />
+              <span className="ml-2">Generating...</span>
+            </>
+          ) : (
+            'Generate Image'
+          )}
+        </button>
+      </div>
     </form>
   );
 };

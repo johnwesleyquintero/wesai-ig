@@ -53,16 +53,19 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
         <div className="mt-4 space-y-4 text-slate-700 dark:text-slate-300 overflow-y-auto max-h-[60vh]">
             {activeTab === 'whats-new' && (
                 <div className="animate-fade-in-scale">
-                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Latest Updates</h3>
+                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Major Upgrade: Multi-Provider Engine</h3>
                     <ul className="list-disc list-inside space-y-3 mt-2">
                         <li>
-                            <span className="font-semibold">Persistent Image Library:</span> Your generated images are now automatically saved to your browser. You can view your entire history and delete any images you no longer need.
+                            <span className="font-semibold">Powered by Google Gemini:</span> We've integrated Google's powerful Imagen model as the new recommended engine for faster, higher-quality results.
                         </li>
                         <li>
-                            <span className="font-semibold">Polished UI & Animations:</span> Enjoy a smoother experience with new animations and a refreshed interface.
+                            <span className="font-semibold">Model Selection:</span> You can now choose between Google Gemini and Hugging Face models before generating an image.
+                        </li>
+                        <li>
+                           <span className="font-semibold">Smart Failover:</span> If Gemini runs into a quota limit, the app will automatically try again with Hugging Face to keep you creating.
                         </li>
                          <li>
-                            <span className="font-semibold">Proactive API Key Prompt:</span> New users will now see a helpful banner to set their API key if it's missing.
+                            <span className="font-semibold">Persistent Image Library:</span> Your generated images are automatically saved to your browser. You can view your entire history and delete any images you no longer need.
                         </li>
                     </ul>
                 </div>
@@ -71,20 +74,24 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
             {activeTab === 'help-center' && (
                 <div className="animate-fade-in-scale space-y-4">
                     <div>
-                        <h4 className="font-semibold text-slate-800 dark:text-slate-100">What is this tool?</h4>
-                        <p className="text-sm">This is an AI-powered image generator that uses Hugging Face's Stable Diffusion model to create images from your text prompts.</p>
+                        <h4 className="font-semibold text-slate-800 dark:text-slate-100">How do I get my API keys?</h4>
+                        <p className="text-sm">This app requires API keys to function. They are stored securely in your browser.</p>
+                        <ul className="text-sm list-disc list-inside mt-1">
+                            <li><span className="font-semibold">Google Gemini:</span> Get your key from <a href="https://ai.google.dev/gemini-api/docs/api-key" target="_blank" rel="noopener noreferrer" className="text-pink-500 hover:underline">Google AI Studio</a>.</li>
+                             <li><span className="font-semibold">Hugging Face:</span> Get your key from your <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer" className="text-pink-500 hover:underline">Hugging Face account settings</a>.</li>
+                        </ul>
                     </div>
                     <div>
-                        <h4 className="font-semibold text-slate-800 dark:text-slate-100">How do I get a Hugging Face API key?</h4>
-                        <p className="text-sm">You can get your free API key from your <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer" className="text-pink-500 hover:underline">Hugging Face account settings</a>. The key is stored securely in your browser and is never sent to our servers.</p>
+                        <h4 className="font-semibold text-slate-800 dark:text-slate-100">Which model should I use?</h4>
+                        <p className="text-sm">We recommend starting with **Google Gemini** for the best performance and quality. Hugging Face is an excellent fallback option.</p>
                     </div>
                     <div>
                         <h4 className="font-semibold text-slate-800 dark:text-slate-100">What is the 'A+ Mockup' feature?</h4>
-                        <p className="text-sm">This feature takes your generated image and places it onto a white background, formatted for e-commerce A+ content modules, perfect for product listings on sites like Amazon.</p>
+                        <p className="text-sm">This feature takes your generated image and places it onto a white background, formatted for e-commerce A+ content modules, perfect for product listings.</p>
                     </div>
                      <div>
                         <h4 className="font-semibold text-slate-800 dark:text-slate-100">Is it free to use?</h4>
-                        <p className="text-sm">This application is free to use, but image generation consumes credits on your Hugging Face account. Hugging Face provides a generous free tier for getting started.</p>
+                        <p className="text-sm">This application is free. However, image generation consumes credits on your Google and/or Hugging Face accounts. Both services provide generous free tiers for getting started.</p>
                     </div>
                 </div>
             )}

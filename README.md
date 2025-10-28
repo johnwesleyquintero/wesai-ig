@@ -1,6 +1,6 @@
 # WesAI Image Generator
 
-A simple and elegant web application to generate images from text prompts using Hugging Face's `stabilityai/stable-diffusion-xl-base-1.0` model. Enter a descriptive prompt, and the AI will create a visual representation. This project is designed to be straightforward to set up and run entirely on the client-side.
+A simple and elegant web application to generate images from text prompts using state-of-the-art AI models. This version features a resilient, multi-provider architecture powered by **Google Gemini** and **Hugging Face**.
 
 <img width="1070" height="987" alt="image" src="https://github.com/user-attachments/assets/42709973-c262-44c3-be28-c51ffc5a5b5c" />
 
@@ -8,18 +8,20 @@ A simple and elegant web application to generate images from text prompts using 
 
 ## ✨ Features
 
-- **AI-Powered Image Generation**: Leverages the Hugging Face Inference API with the `stabilityai/stable-diffusion-xl-base-1.0` model to create images from text.
+- **Multi-Provider AI Engine**: Choose between Google's powerful `imagen-4.0-generate-001` model (recommended) or Hugging Face's `stabilityai/stable-diffusion-xl-base-1.0`.
+- **Smart Failover**: If the primary model (Gemini) hits a quota limit, the app automatically switches to the fallback provider to ensure uninterrupted creativity.
+- **Persistent Image Library**: All your generated images are saved in your browser's local storage. Review, download, or delete your creations at any time.
 - **Client-Side Focused**: Runs directly in the browser, making it easy to deploy on any static hosting platform.
-- **API Key Management**: A simple settings modal allows you to securely save your Hugging Face API key in your browser's local storage.
-- **A+ Content Mockup**: Automatically generate an e-commerce-ready "A+ Content" mockup from your generated image, ideal for product listings.
-- **Sleek, Responsive UI**: A modern and clean user interface that works beautifully on both desktop and mobile devices.
-- **Light & Dark Mode**: A comfortable viewing experience in any lighting condition with a polished theme switcher.
-- **Inspiration Prompts**: Get started quickly with a curated list of sample prompts.
+- **Dual API Key Management**: A clean, tabbed settings modal allows you to securely save both your Google and Hugging Face API keys.
+- **A+ Content Mockup**: Automatically generate an e-commerce-ready "A+ Content" mockup from your generated image.
+- **Sleek, Responsive UI**: A modern interface with light and dark modes, designed to work beautifully on any device.
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: [React](https://reactjs.org/) (with TypeScript)
-- **AI Backend**: [Hugging Face Inference API](https://huggingface.co/inference-api)
+- **AI Providers**: 
+    - [Google Gemini API](https://ai.google.dev/)
+    - [Hugging Face Inference API](https://huggingface.co/inference-api)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **Deployment**: Any static web host (e.g., Vercel, Netlify, GitHub Pages)
 
@@ -30,7 +32,8 @@ To get a local copy up and running, follow these simple steps.
 ### Prerequisites
 
 - Node.js (v18.x or later)
-- A Hugging Face User Access Token (API Key).
+- A Google API Key for Gemini
+- A Hugging Face User Access Token (API Key)
 
 ### Installation & Setup
 
@@ -40,25 +43,27 @@ To get a local copy up and running, follow these simple steps.
     cd wesai-image-generator
     ```
 
-2.  **Get your Hugging Face API Key:**
-    - Go to your Hugging Face profile settings: [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens).
-    - Create a new User Access Token with the "read" role. This will be your API key.
+2.  **Get your API Keys:**
+    - **Google Gemini:**
+        - Go to [ai.google.dev](https://ai.google.dev/) to create your API key.
+    - **Hugging Face:**
+        - Go to your Hugging Face profile settings: [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens).
+        - Create a new User Access Token with the "read" role.
 
 3.  **Run the application:**
-    This project is set up to run in a development environment like AI Studio. Once running, click the "Settings" icon in the top right corner to enter and save your Hugging Face API key. The key will be stored in your browser's local storage for future visits.
+    This project is set up to run in a development environment like AI Studio. Once running, click the "Settings" icon in the top right corner to enter and save your API keys in their respective tabs. Keys are stored only in your browser's local storage.
 
 4.  **Start generating!**
-    With the key saved, you can now enter a prompt and generate images.
+    With the keys saved, you can now select a model, enter a prompt, and generate images.
 
 ## ⚙️ How It Works
 
-This application communicates directly with the Hugging Face Inference API from the client-side (your browser).
+This application communicates directly with the Google and Hugging Face APIs from the client-side.
 
--   When you enter your API key, it is saved securely in your browser's `localStorage`.
--   When you submit a prompt, the application sends a `fetch` request to the Hugging Face API, including your prompt and the API key in the authorization header.
--   The API returns an image blob, which is then converted into a data URL and displayed on the page.
-
-This client-side approach simplifies deployment, as there is no backend to manage.
+-   When you enter your API keys, they are saved securely in your browser's `localStorage`.
+-   When you submit a prompt, the application sends a `fetch` request to the selected API provider, including your prompt and the corresponding API key.
+-   The API returns an image, which is then converted into a data URL and displayed on the page.
+-   The smart failover logic provides a seamless experience by automatically retrying with the alternate provider if a quota error is detected.
 
 ## 🤝 Contributing
 

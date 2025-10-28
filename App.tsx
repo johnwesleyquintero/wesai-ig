@@ -4,9 +4,10 @@ import PromptInput from './components/PromptInput';
 import ImageDisplay from './components/ImageDisplay';
 import SettingsModal from './components/SettingsModal';
 import HelpModal from './components/HelpModal';
-import { generateImage } from './services/clientService';
+import { generateImageWithGemini } from './services/geminiService';
+import { generateImageWithHuggingFace } from './services/clientService';
 import { ApiKeyContext } from './contexts/ApiKeyContext';
-import type { GeneratedImage } from './types';
+import type { GeneratedImage, GenerationModel } from './types';
 import { InfoIcon } from './components/Icons';
 
 function App() {
@@ -16,7 +17,7 @@ function App() {
   const [isQuotaError, setIsQuotaError] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
-  const { apiKey, isLoading: isKeyLoading } = useContext(ApiKeyContext);
+  const { geminiApiKey, huggingFaceApiKey, isKeyLoading } = useContext(ApiKeyContext);
 
   // Load images from localStorage on initial render
   useEffect(() => {
@@ -31,9 +32,10 @@ function App() {
     }
   }, []);
 
-  const handleGenerate = useCallback(async (prompt: string) => {
-    if (!apiKey) {
-      setError("API Key is not set. Please add it in the settings.");
+  const handleGenerate = useCallback(async (prompt: string, model: GenerationModel) => {
+    const activeApiKey = model === 'gemini' ? geminiApiKey : huggingFaceApiKey;
+    if (!activeApiKey) {
+      setError(`API Key for ${model === 'gemini' ? 'Google Gemini' : 'Hugging Face'} is not set.`);
       setIsSettingsOpen(true);
       return;
     }
@@ -43,7 +45,24 @@ function App() {
     setIsQuotaError(false);
 
     try {
-      const imageUrl = await generateImage(prompt, apiKey);
+      let imageUrl;
+      if (model === 'gemini') {
+        try {
+          imageUrl = await generateImageWithGemini(prompt, geminiApiKey!);
+        } catch (geminiErr) {
+          // Smart Failover: If Gemini fails with a quota error and HF key exists, try HF.
+          const isGeminiQuotaError = geminiErr instanceof Error && (geminiErr.message.includes('quota') || geminiErr.message.includes('billing'));
+          if (isGeminiQuotaError && huggingFaceApiKey) {
+            console.log("Gemini quota error, attempting fallback to Hugging Face...");
+            imageUrl = await generateImageWithHuggingFace(prompt, huggingFaceApiKey);
+          } else {
+            throw geminiErr; // Re-throw other Gemini errors
+          }
+        }
+      } else {
+        imageUrl = await generateImageWithHuggingFace(prompt, huggingFaceApiKey!);
+      }
+
       setImages(prevImages => {
         const newImage: GeneratedImage = { id: Date.now().toString(), src: imageUrl, prompt };
         const updatedImages = [newImage, ...prevImages];
@@ -52,7 +71,7 @@ function App() {
       });
     } catch (err) {
       const message = err instanceof Error ? err.message : "An unknown error occurred.";
-      if (message.includes("quota")) {
+      if (message.toLowerCase().includes("quota") || message.toLowerCase().includes("billing")) {
         setIsQuotaError(true);
       }
       setError(`Failed to generate image: ${message}`);
@@ -60,7 +79,7 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [apiKey]);
+  }, [geminiApiKey, huggingFaceApiKey]);
 
   const handleDeleteImage = (idToDelete: string) => {
     setImages(prevImages => {
@@ -78,13 +97,13 @@ function App() {
           onHelpClick={() => setIsHelpOpen(true)}
         />
         <main className="mt-8 space-y-8">
-          {!isKeyLoading && !apiKey && (
+          {!isKeyLoading && !geminiApiKey && !huggingFaceApiKey && (
             <div className="bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600/50 text-amber-800 dark:text-amber-200 px-4 py-3 rounded-lg flex items-center justify-between shadow-sm" role="alert">
               <div className="flex items-center">
                 <InfoIcon />
                 <p className="ml-3 font-medium">
-                  Your Hugging Face API key is not set.
-                  <button onClick={() => setIsSettingsOpen(true)} className="ml-2 font-bold hover:underline focus:outline-none focus:ring-2 focus:ring-amber-500 rounded">Set it here</button> to begin.
+                  No API keys are set. 
+                  <button onClick={() => setIsSettingsOpen(true)} className="ml-2 font-bold hover:underline focus:outline-none focus:ring-2 focus:ring-amber-500 rounded">Set one here</button> to begin.
                 </p>
               </div>
             </div>

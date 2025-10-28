@@ -15,16 +15,24 @@ const ErrorAlert: React.FC<ErrorAlertProps> = ({ message, isQuotaError = false }
       <span className="block sm:inline">{message}</span>
       {isQuotaError && (
         <p className="mt-2 text-sm">
-          This may be due to reaching the free tier limit. Please check your{' '}
+          This may be due to reaching a service's free tier limit. Please check your provider's billing settings.
+          <br/>
+          <a
+            href="https://ai.google.dev/gemini-api/docs/billing"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-red-800 dark:text-red-300 hover:underline mr-4"
+          >
+            Google AI Billing
+          </a>
           <a
             href="https://huggingface.co/settings/billing"
             target="_blank"
             rel="noopener noreferrer"
             className="font-semibold text-red-800 dark:text-red-300 hover:underline"
           >
-            Hugging Face billing settings
+            Hugging Face Billing
           </a>
-          .
         </p>
       )}
     </div>

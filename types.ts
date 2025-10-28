@@ -4,3 +4,5 @@ export interface GeneratedImage {
   src: string;
   prompt: string;
 }
+
+export type GenerationModel = 'gemini' | 'huggingface';
