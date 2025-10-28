@@ -71,11 +71,17 @@ function App() {
       });
     } catch (err) {
       const message = err instanceof Error ? err.message : "An unknown error occurred.";
-      if (message.toLowerCase().includes("quota") || message.toLowerCase().includes("billing")) {
+
+      if (message === "ASPECT_RATIO_BILLING_ERROR") {
+        setError("Aspect ratio selection uses a Pro model that requires a billed Google AI account. Please enable billing or use the default 1:1 ratio.");
         setIsQuotaError(true);
+      } else {
+        if (message.toLowerCase().includes("quota") || message.toLowerCase().includes("billing")) {
+          setIsQuotaError(true);
+        }
+        setError(`Failed to generate image: ${message}`);
+        console.error(err);
       }
-      setError(`Failed to generate image: ${message}`);
-      console.error(err);
     } finally {
       setIsLoading(false);
     }
