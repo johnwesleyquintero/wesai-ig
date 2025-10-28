@@ -10,11 +10,11 @@ interface ImageDisplayProps {
   images: GeneratedImage[];
   isLoading: boolean;
   error: string | null;
-  prompt: string;
   isQuotaError: boolean;
+  prompt: string;
 }
 
-const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, prompt, isQuotaError }) => {
+const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, isQuotaError, prompt }) => {
   const { mockupSrc, isCreatingMockup, createMockup } = useMockup(images.length > 0 ? images[0].src : null);
   const [copied, setCopied] = React.useState(false);
 

@@ -1,28 +1,28 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useContext } from 'react';
 import Header from './components/Header';
 import PromptInput from './components/PromptInput';
 import ImageDisplay from './components/ImageDisplay';
 import SettingsModal from './components/SettingsModal';
-import { useApiKey } from './contexts/ApiKeyContext';
 import { generateImage } from './services/clientService';
+import { ApiKeyContext } from './contexts/ApiKeyContext';
 import type { GeneratedImage } from './types';
 
 function App() {
-  const { apiKey } = useApiKey();
   const [images, setImages] = useState<GeneratedImage[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isQuotaError, setIsQuotaError] = useState<boolean>(false);
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [lastPrompt, setLastPrompt] = useState<string>('');
-  
+  const { apiKey } = useContext(ApiKeyContext);
+
   const handleGenerate = useCallback(async (prompt: string) => {
     if (!apiKey) {
-      setError("Please set your Hugging Face API key in the settings before generating images.");
-      setIsSettingsModalOpen(true);
+      setError("API Key is not set. Please add it in the settings.");
+      setIsSettingsOpen(true);
       return;
     }
-    
+
     setIsLoading(true);
     setError(null);
     setIsQuotaError(false);
@@ -34,19 +34,11 @@ function App() {
       setImages([{ src: imageUrl }]);
       setLastPrompt(prompt);
     } catch (err) {
-      let finalMessage = "Failed to generate image: An unknown error occurred.";
-      if (err instanceof Error) {
-        if (err.message.toLowerCase().includes('quota') || err.message.toLowerCase().includes('rate limit')) {
-            finalMessage = "You may have exceeded your Hugging Face API quota or hit a rate limit.";
-            setIsQuotaError(true);
-        } else if (err.message.includes("is currently loading")) {
-            finalMessage = "The model is loading. Please try again in a few moments.";
-        }
-        else {
-            finalMessage = `Failed to generate image: ${err.message}`;
-        }
+      const message = err instanceof Error ? err.message : "An unknown error occurred.";
+      if (message.includes("quota")) {
+        setIsQuotaError(true);
       }
-      setError(finalMessage);
+      setError(`Failed to generate image: ${message}`);
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -56,12 +48,18 @@ function App() {
   return (
     <div className="min-h-screen text-slate-800 dark:text-slate-200 flex flex-col items-center font-sans p-4 sm:p-6">
       <div className="w-full max-w-4xl" aria-busy={isLoading}>
-        <Header onOpenSettings={() => setIsSettingsModalOpen(true)} />
+        <Header onSettingsClick={() => setIsSettingsOpen(true)} />
         <main className="mt-8 space-y-12">
-          <PromptInput onGenerate={handleGenerate} isLoading={isLoading} isApiKeySet={!!apiKey} />
-          <ImageDisplay images={images} isLoading={isLoading} error={error} prompt={lastPrompt} isQuotaError={isQuotaError} />
+          <PromptInput onGenerate={handleGenerate} isLoading={isLoading} />
+          <ImageDisplay 
+            images={images} 
+            isLoading={isLoading} 
+            error={error} 
+            isQuotaError={isQuotaError}
+            prompt={lastPrompt} 
+          />
         </main>
-        <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} />
+        {isSettingsOpen && <SettingsModal onClose={() => setIsSettingsOpen(false)} />}
       </div>
     </div>
   );

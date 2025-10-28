@@ -1,44 +1,46 @@
+// This is the recommended model for this task.
+const HF_API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1";
+
 /**
- * Generates an image by calling the Hugging Face Inference API.
+ * Generates an image by calling the Hugging Face Inference API directly from the client.
  * @param prompt The text prompt to generate an image from.
- * @param apiKey The user's Hugging Face API key.
+ * @param apiKey The Hugging Face API key.
  * @returns A promise that resolves to a data URL of the generated image.
  */
 export async function generateImage(prompt: string, apiKey: string): Promise<string> {
-  const HUGGINGFACE_API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0";
-
   try {
-    const response = await fetch(HUGGINGFACE_API_URL, {
+    const response = await fetch(HF_API_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'x-use-cache': 'false' // Disables caching to get new images
       },
       body: JSON.stringify({ inputs: prompt }),
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Failed to parse error response from Hugging Face API.' }));
-      // The API often returns a helpful error message in the `error` property
-      const errorMessage = errorData.error || `API request failed with status ${response.status}`;
-      throw new Error(errorMessage);
+        if (response.status === 429) {
+            throw new Error('API rate limit or quota exceeded. Please check your Hugging Face plan and billing details.');
+        }
+        const errorData = await response.json().catch(() => ({ error: 'Failed to parse error response.' }));
+        throw new Error(errorData.error || `API request failed with status ${response.status}`);
     }
 
     const blob = await response.blob();
+    
+    // Check if the blob is of type JSON, which indicates an error from the API
+    if (blob.type === 'application/json') {
+        const errorText = await blob.text();
+        const errorJson = JSON.parse(errorText);
+        throw new Error(errorJson.error || 'The model returned an unexpected error.');
+    }
 
-    // Convert blob to a data URL to display the image
+    // Convert the image blob to a data URL to display it
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
-          resolve(reader.result);
-        } else {
-          reject(new Error('Failed to convert image blob to data URL.'));
-        }
-      };
-      reader.onerror = () => {
-        reject(new Error('Error reading image blob.'));
-      };
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
       reader.readAsDataURL(blob);
     });
 

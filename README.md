@@ -1,6 +1,6 @@
 # WesAI Image Generator
 
-A powerful and intuitive web application for generating high-quality images from text prompts using Google's state-of-the-art AI models. This tool is designed for creatives, marketers, and developers to bring their ideas to life visually.
+A simple and elegant web application to generate images from text prompts using Hugging Face's Stable Diffusion model. Enter a descriptive prompt, and the AI will create a visual representation. This project is designed to be straightforward to set up and run entirely on the client-side.
 
 <img width="1070" height="987" alt="image" src="https://github.com/user-attachments/assets/42709973-c262-44c3-be28-c51ffc5a5b5c" />
 
@@ -8,24 +8,20 @@ A powerful and intuitive web application for generating high-quality images from
 
 ## ✨ Features
 
-- **AI-Powered Image Generation**: Utilizes Google's `Gemini Flash Image` and `Imagen 4` models to create stunning visuals from simple text descriptions.
-- **Model Selection**: Seamlessly switch between different AI models to find the perfect style for your creation.
-- **Custom Aspect Ratios**: Generate images in various formats, including `1:1`, `16:9`, `9:16`, `4:3`, and `3:4`, perfect for social media, presentations, or artwork.
+- **AI-Powered Image Generation**: Leverages the Hugging Face Inference API with a Stable Diffusion model to create images from text.
+- **Client-Side Focused**: Runs directly in the browser, making it easy to deploy on any static hosting platform.
+- **API Key Management**: A simple settings modal allows you to securely save your Hugging Face API key in your browser's local storage.
 - **A+ Content Mockup**: Automatically generate an e-commerce-ready "A+ Content" mockup from your generated image, ideal for product listings.
 - **Sleek, Responsive UI**: A modern and clean user interface that works beautifully on both desktop and mobile devices.
 - **Light & Dark Mode**: A comfortable viewing experience in any lighting condition with a polished theme switcher.
-- **Secure API Key Handling**: API keys are stored securely in your browser's local storage and are never exposed on the client-side for backend operations.
 - **Inspiration Prompts**: Get started quickly with a curated list of sample prompts.
 
 ## 🛠️ Tech Stack
 
-This project is built with a modern, scalable, and efficient technology stack:
-
 - **Frontend**: [React](https://reactjs.org/) (with TypeScript)
-- **AI Backend**: [Google Gemini API](https://ai.google.dev/docs/gemini_api_overview) (`@google/genai`)
+- **AI Backend**: [Hugging Face Inference API](https://huggingface.co/inference-api)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Serverless Functions**: Vercel Edge Functions
-- **Deployment**: [Vercel](https://vercel.com/)
+- **Deployment**: Any static web host (e.g., Vercel, Netlify, GitHub Pages)
 
 ## 🚀 Getting Started
 
@@ -34,7 +30,7 @@ To get a local copy up and running, follow these simple steps.
 ### Prerequisites
 
 - Node.js (v18.x or later)
-- npm, yarn, or pnpm
+- A Hugging Face User Access Token (API Key).
 
 ### Installation & Setup
 
@@ -44,42 +40,30 @@ To get a local copy up and running, follow these simple steps.
     cd wesai-image-generator
     ```
 
-2.  **Install dependencies:**
-    ```sh
-    npm install
-    ```
+2.  **Get your Hugging Face API Key:**
+    - Go to your Hugging Face profile settings: [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens).
+    - Create a new User Access Token with the "read" role. This will be your API key.
 
-3.  **Set up environment variables:**
-    Create a file named `.env.local` in the root of your project and add your Google AI Studio API key. You can get one from [Google AI Studio](https://makersuite.google.com/app/apikey).
-    ```env
-    # .env.local
-    API_KEY="YOUR_GOOGLE_API_KEY"
-    ```
-    This key is used by the backend Vercel Edge Function (`/api/generate`) to communicate with the Gemini API securely.
+3.  **Run the application:**
+    This project is set up to run in a development environment like AI Studio. Once running, click the "Settings" icon in the top right corner to enter and save your Hugging Face API key. The key will be stored in your browser's local storage for future visits.
 
-4.  **Run the development server:**
-    ```sh
-    npm run dev
-    ```
-    Open [http://localhost:5173](http://localhost:5173) (or your configured port) to view it in the browser.
+4.  **Start generating!**
+    With the key saved, you can now enter a prompt and generate images.
 
-## ⚙️ Configuration
+## ⚙️ How It Works
 
-The application is configured to use the Google Gemini API via a secure backend endpoint.
+This application communicates directly with the Hugging Face Inference API from the client-side (your browser).
 
--   **Frontend**: The React application collects the user's prompt, selected model, and aspect ratio.
--   **Backend (`/api/generate`)**: A Vercel Edge Function receives the request from the frontend, securely attaches the `API_KEY` from environment variables, and calls the appropriate Google Gemini model. This ensures your API key is never exposed to the client.
+-   When you enter your API key, it is saved securely in your browser's `localStorage`.
+-   When you submit a prompt, the application sends a `fetch` request to the Hugging Face API, including your prompt and the API key in the authorization header.
+-   The API returns an image blob, which is then converted into a data URL and displayed on the page.
 
-*Note: The initial version of this application used the Hugging Face API directly on the client. The current architecture has been upgraded to use a more secure and powerful backend-for-frontend (BFF) pattern with the Gemini API.*
+This client-side approach simplifies deployment, as there is no backend to manage.
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/your-username/wesai-image-generator/issues).
+Contributions, issues, and feature requests are welcome!
 
 ## 📄 License
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
----
-
-Built with passion by **John Wesley Quintero**.
+This project is licensed under the MIT License.

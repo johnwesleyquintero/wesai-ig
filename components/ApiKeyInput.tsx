@@ -1,61 +1,64 @@
-import React, { useState, useEffect } from 'react';
-import { useApiKey } from '../contexts/ApiKeyContext';
+import React, { useState, useContext, useEffect } from 'react';
+import { ApiKeyContext } from '../contexts/ApiKeyContext';
+import Spinner from './Spinner';
 
-interface ApiKeyInputProps {
-  onKeySaved?: () => void;
-}
-
-const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onKeySaved }) => {
-  const { apiKey, setApiKey } = useApiKey();
-  const [inputValue, setInputValue] = useState(apiKey || '');
-  const [isSaved, setIsSaved] = useState(false);
+const ApiKeyInput: React.FC = () => {
+  const { apiKey, setApiKey, isKeyValid, isLoading, validateKey } = useContext(ApiKeyContext);
+  const [localKey, setLocalKey] = useState(apiKey || '');
 
   useEffect(() => {
-    setInputValue(apiKey || '');
+    setLocalKey(apiKey || '');
   }, [apiKey]);
   
   const handleSave = () => {
-    setApiKey(inputValue.trim());
-    setIsSaved(true);
-    // Hide the confirmation message and call the callback after a short delay
-    setTimeout(() => {
-        setIsSaved(false);
-        if (onKeySaved) {
-            onKeySaved();
-        }
-    }, 1500);
+    setApiKey(localKey);
+    validateKey(localKey);
   };
 
+  const getStatusIndicator = () => {
+    if (isLoading) {
+      return <Spinner />;
+    }
+    if (!apiKey) {
+      return <span className="text-sm text-yellow-500">No key set</span>;
+    }
+    if (isKeyValid) {
+      return <span className="text-sm text-green-500">✓ Valid</span>;
+    }
+    return <span className="text-sm text-red-500">✗ Invalid</span>;
+  };
+  
   return (
-    <div className="w-full">
-      <label htmlFor="api-key-input" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-        Hugging Face API Key
-      </label>
-      <div className="flex flex-col sm:flex-row gap-2">
-        <input
-          type="password"
-          id="api-key-input"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Enter your API key..."
-          className="flex-grow p-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500"
-        />
-        <button
-          onClick={handleSave}
-          className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-          disabled={!inputValue.trim()}
-        >
-          Save & Close
-        </button>
-      </div>
-       {isSaved && (
-        <p className="text-xs text-green-600 dark:text-green-400 mt-2">
-          API Key saved!
+    <div className="space-y-4">
+      <div>
+        <label htmlFor="api-key-input" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+          Hugging Face API Key
+        </label>
+        <div className="mt-1 flex rounded-md shadow-sm">
+          <input
+            id="api-key-input"
+            type="password"
+            value={localKey}
+            onChange={(e) => setLocalKey(e.target.value)}
+            className="flex-1 block w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-none rounded-l-md focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
+            placeholder="hf_..."
+          />
+          <button
+            onClick={handleSave}
+            disabled={isLoading}
+            className="inline-flex items-center px-4 py-2 border border-l-0 border-pink-600 bg-pink-600 text-white rounded-r-md hover:bg-pink-700 disabled:opacity-50"
+          >
+            Save
+          </button>
+        </div>
+         <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+          Get your key from your <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer" className="text-pink-500 hover:underline">Hugging Face settings</a>. The key is stored only in your browser.
         </p>
-      )}
-      <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-          Your key is stored only in your browser. Get yours from your <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer" className="font-semibold underline hover:text-indigo-500">Hugging Face account settings</a>.
-      </p>
+      </div>
+      <div className="flex items-center justify-between p-2 bg-slate-100 dark:bg-slate-700/50 rounded-md">
+        <span className="text-sm font-medium">Status:</span>
+        {getStatusIndicator()}
+      </div>
     </div>
   );
 };
