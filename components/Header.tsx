@@ -23,7 +23,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenSettings }) => {
         <h1 className="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-pink-500 to-red-500">
           WesAI Image Generator
         </h1>
-        <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">
+        <p className="mt-2 text-base sm:text-lg text-slate-600 dark:text-slate-400">
           Powered by Hugging Face
         </p>
       </header>

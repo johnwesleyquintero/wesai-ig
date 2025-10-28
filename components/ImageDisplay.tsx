@@ -41,30 +41,30 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, p
         <div className="space-y-12">
           {/* Original Image Display */}
           <div>
-            <div className="flex justify-between items-center mb-4 border-b-2 border-slate-200 dark:border-slate-700 pb-2">
-                <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Generated Image</h2>
-                <button onClick={handleCopyPrompt} className="flex items-center text-sm text-slate-500 dark:text-slate-400 hover:text-pink-600 dark:hover:text-pink-500 transition-colors duration-200">
-                    <CopyIcon />
-                    <span className="ml-2">{copied ? 'Copied!' : 'Copy Prompt'}</span>
-                </button>
+            <div className="mb-4 border-b-2 border-slate-200 dark:border-slate-700 pb-2">
+                <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-slate-100">Generated Image</h2>
             </div>
             <div className="grid grid-cols-1 gap-8">
               {images.map((image, index) => (
-                <div key={index} className="group relative bg-white dark:bg-slate-800 p-4 rounded-lg shadow-lg overflow-hidden border border-slate-200 dark:border-slate-700">
+                <div key={index} className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700">
                    <img
                       src={image.src}
                       alt={`Generated image for prompt: ${prompt}`}
                       className="w-full h-auto object-cover rounded-md"
                    />
-                   <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center">
-                     <a
-                       href={image.src}
-                       download={`generated-image-${Date.now()}.jpeg`}
-                       className="bg-white text-slate-900 px-4 py-2 rounded-lg flex items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform group-hover:scale-100 scale-95 hover:bg-slate-100"
-                     >
-                        <DownloadIcon />
-                        Download
-                     </a>
+                   <div className="mt-4 flex flex-col sm:flex-row items-center justify-end gap-3">
+                        <button onClick={handleCopyPrompt} className="w-full sm:w-auto flex items-center justify-center px-4 py-2 text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-md hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors duration-200">
+                            <CopyIcon />
+                            <span className="ml-2">{copied ? 'Copied!' : 'Copy Prompt'}</span>
+                        </button>
+                        <a
+                           href={image.src}
+                           download={`generated-image-${Date.now()}.jpeg`}
+                           className="w-full sm:w-auto flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-pink-600 rounded-md hover:bg-pink-700 transition-colors duration-200"
+                        >
+                            <DownloadIcon />
+                            <span>Download</span>
+                        </a>
                    </div>
                 </div>
               ))}
