@@ -23,13 +23,33 @@ export async function generateImage(prompt: string, apiKey: string): Promise<str
         if (response.status === 429) {
             throw new Error('API rate limit or quota exceeded. Please check your Hugging Face plan and billing details.');
         }
-        const errorData = await response.json().catch(() => ({ error: 'Failed to parse error response.' }));
-        throw new Error(errorData.error || `API request failed with status ${response.status}`);
+
+        // Handle model loading error (503) specifically
+        if (response.status === 503) {
+             const errorData = await response.json().catch(() => null);
+             if (errorData && errorData.error) {
+                // e.g., "Model stabilityai/stable-diffusion-2-1 is currently loading"
+                throw new Error(errorData.error);
+             }
+             // Fallback for 503 if JSON parsing fails
+             throw new Error('The model is currently loading on the server. Please try again in a few moments.');
+        }
+        
+        // For other errors, attempt to read the response as text first for better diagnostics
+        const errorText = await response.text();
+        try {
+            // See if the text is valid JSON with an error message
+            const errorData = JSON.parse(errorText);
+            throw new Error(errorData.error || `API request failed with status ${response.status}`);
+        } catch (e) {
+            // If it's not JSON, the errorText itself is the message
+            throw new Error(errorText || `API request failed with status ${response.status}`);
+        }
     }
 
     const blob = await response.blob();
     
-    // Check if the blob is of type JSON, which indicates an error from the API
+    // Check if the blob is of type JSON, which indicates an error from the API (e.g. during a successful request but invalid input)
     if (blob.type === 'application/json') {
         const errorText = await blob.text();
         const errorJson = JSON.parse(errorText);
