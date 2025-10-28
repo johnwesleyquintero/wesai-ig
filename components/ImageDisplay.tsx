@@ -11,17 +11,19 @@ interface ImageDisplayProps {
   isLoading: boolean;
   error: string | null;
   isQuotaError: boolean;
-  prompt: string;
 }
 
-const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, isQuotaError, prompt }) => {
-  const { mockupSrc, isCreatingMockup, createMockup } = useMockup(images.length > 0 ? images[0].src : null);
+const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, isQuotaError }) => {
+  const [latestImage, ...historyImages] = images;
+  const { mockupSrc, isCreatingMockup, createMockup } = useMockup(latestImage ? latestImage.src : null);
   const [copied, setCopied] = React.useState(false);
 
   const handleCopyPrompt = () => {
-      navigator.clipboard.writeText(prompt);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      if (latestImage) {
+        navigator.clipboard.writeText(latestImage.prompt);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
   };
   
   // This wrapper will announce content changes to screen readers
@@ -37,19 +39,18 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
 
       {error && <ErrorAlert message={error} isQuotaError={isQuotaError} />}
 
-      {!isLoading && !error && images.length > 0 && (
+      {!isLoading && !error && latestImage && (
         <div className="space-y-12">
           {/* Original Image Display */}
-          <div>
+          <div key={latestImage.src} className="animate-fade-in-scale">
             <div className="mb-4 border-b-2 border-slate-200 dark:border-slate-700 pb-2">
-                <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-slate-100">Generated Image</h2>
+                <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-slate-100">Latest Image</h2>
             </div>
             <div className="grid grid-cols-1 gap-8">
-              {images.map((image, index) => (
-                <div key={index} className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700">
+                <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700">
                    <img
-                      src={image.src}
-                      alt={`Generated image for prompt: ${prompt}`}
+                      src={latestImage.src}
+                      alt={`Generated image for prompt: ${latestImage.prompt}`}
                       className="w-full h-auto object-cover rounded-md"
                    />
                    <div className="mt-4 flex flex-col sm:flex-row items-center justify-end gap-3">
@@ -58,7 +59,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
                             <span className="ml-2">{copied ? 'Copied!' : 'Copy Prompt'}</span>
                         </button>
                         <a
-                           href={image.src}
+                           href={latestImage.src}
                            download={`generated-image-${Date.now()}.jpeg`}
                            className="w-full sm:w-auto flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-pink-600 rounded-md hover:bg-pink-700 transition-colors duration-200"
                         >
@@ -67,7 +68,6 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
                         </a>
                    </div>
                 </div>
-              ))}
             </div>
           </div>
 
@@ -92,14 +92,37 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
               
               {mockupSrc && <MockupDisplay mockupSrc={mockupSrc} />}
           </div>
+
+          {/* Session History */}
+          {historyImages.length > 0 && (
+            <div className="mt-16">
+              <div className="mb-4 border-b-2 border-slate-200 dark:border-slate-700 pb-2">
+                <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-slate-100">Session History</h2>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {historyImages.map((image) => (
+                  <div key={image.src} className="group relative rounded-lg overflow-hidden shadow-md aspect-square bg-slate-100 dark:bg-slate-800">
+                    <img
+                      src={image.src}
+                      alt={`Generated image for prompt: ${image.prompt}`}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-2">
+                      <p className="text-white text-xs text-center line-clamp-4">{image.prompt}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
       {!isLoading && !error && images.length === 0 && (
         <div className="text-center p-12 bg-slate-100/50 dark:bg-slate-800/50 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg">
           <ImageIcon />
-          <p className="mt-4 text-lg font-medium text-slate-600 dark:text-slate-400">Your generated images will appear here.</p>
-          <p className="text-slate-500 text-sm mt-1">Enter a prompt above and click "Generate Image" to start.</p>
+          <p className="mt-4 text-lg font-medium text-slate-600 dark:text-slate-400">Your masterpiece awaits.</p>
+          <p className="text-slate-500 text-sm mt-1">Enter a prompt above and let your imagination take flight.</p>
         </div>
       )}
     </div>
