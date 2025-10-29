@@ -6,11 +6,12 @@ import ErrorAlert from './ErrorAlert';
 import MockupDisplay from './MockupDisplay';
 import PreviewModal from './PreviewModal';
 import CanvasModal from './CanvasModal';
-import { CopyIcon, DownloadIcon, ImageIcon, TrashIcon, EditIcon, UsePromptIcon } from './Icons';
+import { CopyIcon, DownloadIcon, ImageIcon, TrashIcon, EditIcon, UsePromptIcon, MockupIcon } from './Icons';
 
 interface ImageDisplayProps {
   images: GeneratedImage[];
   isLoading: boolean;
+  prompt: string;
   error: string | null;
   isQuotaError: boolean;
   onDeleteImage: (id: string) => void;
@@ -18,26 +19,28 @@ interface ImageDisplayProps {
   onUsePrompt: (prompt: string) => void;
 }
 
-const LatestImageSkeleton = () => (
-  <div className="animate-pulse space-y-12">
-    <div>
-      <div className="mb-4 border-b-2 border-slate-200 dark:border-slate-700 pb-2">
-          <div className="h-7 bg-slate-200 dark:bg-slate-700 rounded w-1/3"></div>
-      </div>
-      <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700">
-         <div className="w-full aspect-square bg-slate-200 dark:bg-slate-700 rounded-md"></div>
-         <div className="mt-4 flex flex-col sm:flex-row items-center justify-end gap-3">
-              <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-md w-full sm:w-32"></div>
-              <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-md w-full sm:w-32"></div>
-              <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-md w-full sm:w-32"></div>
-         </div>
+const LatestImageSkeleton: React.FC<{ prompt: string }> = ({ prompt }) => (
+    <div className="space-y-12">
+      <div>
+        <div className="mb-4 border-b-2 border-slate-200 dark:border-slate-700 pb-2">
+            <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-slate-100">Generating...</h2>
+            {prompt && <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 truncate">Your prompt: "{prompt}"</p>}
+        </div>
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 animate-pulse">
+           <div className="w-full aspect-square bg-slate-200 dark:bg-slate-700 rounded-md"></div>
+           <div className="mt-4 flex flex-col sm:flex-row items-center justify-end gap-3">
+                <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-md w-full sm:w-32"></div>
+                <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-md w-full sm:w-32"></div>
+                <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-md w-full sm:w-32"></div>
+                <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-md w-full sm:w-32"></div>
+           </div>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
 
 
-const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, isQuotaError, onDeleteImage, onSaveEditedImage, onUsePrompt }) => {
+const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, prompt, error, isQuotaError, onDeleteImage, onSaveEditedImage, onUsePrompt }) => {
   const [latestImage, ...historyImages] = images;
   const { mockupSrc, isCreatingMockup, createMockup } = useMockup(latestImage ? latestImage.src : null);
   const [copied, setCopied] = React.useState(false);
@@ -60,7 +63,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
 
   return (
     <div aria-live="polite">
-      {isLoading && <LatestImageSkeleton />}
+      {isLoading && <LatestImageSkeleton prompt={prompt} />}
 
       {error && <ErrorAlert message={error} isQuotaError={isQuotaError} />}
 
@@ -84,11 +87,19 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
                             <span className="ml-2">{copied ? 'Copied!' : 'Copy Prompt'}</span>
                         </button>
                         <button 
+                            onClick={createMockup}
+                            disabled={isCreatingMockup}
+                            className="w-full sm:w-auto flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 transition-colors duration-200"
+                        >
+                            {isCreatingMockup ? <Spinner /> : <MockupIcon />}
+                            <span className="ml-1">{isCreatingMockup ? 'Creating...' : 'Mockup'}</span>
+                        </button>
+                        <button 
                             onClick={() => setEditingImage(latestImage)}
                             className="w-full sm:w-auto flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700 transition-colors duration-200"
                         >
                             <EditIcon />
-                            <span>Edit Image</span>
+                            <span>Edit</span>
                         </button>
                         <a
                            href={latestImage.src}
@@ -102,29 +113,14 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
                 </div>
             </div>
           </div>
-
-          {/* A+ Mockup Section */}
-          <div className="text-center">
-              {!mockupSrc && (
-                  <button
-                      onClick={createMockup}
-                      disabled={isCreatingMockup}
-                      className="px-8 py-3 flex items-center justify-center mx-auto font-semibold text-white bg-gradient-to-r from-green-500 to-teal-500 rounded-lg shadow-md hover:from-green-600 hover:to-teal-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300"
-                  >
-                      {isCreatingMockup ? (
-                          <>
-                              <Spinner />
-                              <span className="ml-2">Creating...</span>
-                          </>
-                      ) : (
-                          'Create A+ Mockup'
-                      )}
-                  </button>
-              )}
-              
-              {mockupSrc && <MockupDisplay mockupSrc={mockupSrc} />}
-          </div>
-
+          
+          {/* A+ Mockup Display (appears here when created) */}
+          {mockupSrc && (
+            <div className="animate-fade-in-scale">
+              <MockupDisplay mockupSrc={mockupSrc} />
+            </div>
+          )}
+          
           {/* Image Library */}
           {historyImages.length > 0 && (
             <div className="mt-16">
@@ -147,10 +143,10 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
                     <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-2">
                       <p className="text-white text-xs text-center line-clamp-4">{image.prompt}</p>
                     </div>
-                     <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-60 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                     <div className="absolute top-2 right-2 flex flex-col gap-2 transition-opacity duration-300 z-10">
                         <button
                             onClick={(e) => handleActionClick(e, () => onUsePrompt(image.prompt))}
-                            className="p-1.5 bg-black/60 rounded-full text-white hover:bg-purple-500 hover:scale-110 transition-all duration-200"
+                            className="p-1.5 bg-black/50 rounded-full text-white hover:bg-purple-500 hover:scale-110 transition-all duration-200"
                             aria-label="Use as prompt"
                             title="Use as Prompt"
                         >
@@ -158,7 +154,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
                         </button>
                         <button
                             onClick={(e) => handleActionClick(e, () => onDeleteImage(image.id))}
-                            className="p-1.5 bg-black/60 rounded-full text-white hover:bg-red-500 hover:scale-110 transition-all duration-200"
+                            className="p-1.5 bg-black/50 rounded-full text-white hover:bg-red-500 hover:scale-110 transition-all duration-200"
                             aria-label="Delete image"
                             title="Delete Image"
                         >

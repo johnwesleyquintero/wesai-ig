@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext } from 'react';
+import React, { useState, useCallback, useContext, useEffect } from 'react';
 import Header from './components/Header';
 import PromptInput from './components/PromptInput';
 import ImageDisplay from './components/ImageDisplay';
@@ -21,6 +21,16 @@ function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const { geminiApiKey, huggingFaceApiKey, stabilityApiKey, isKeyLoading } = useContext(ApiKeyContext);
+  const [hasVisited, setHasVisited] = useLocalStorage<boolean>('wesai_has_visited', false);
+
+  // Proactive onboarding for first-time users
+  useEffect(() => {
+    if (!isKeyLoading && !geminiApiKey && !huggingFaceApiKey && !stabilityApiKey && !hasVisited) {
+      setIsSettingsOpen(true);
+      setHasVisited(true);
+    }
+  }, [isKeyLoading, geminiApiKey, huggingFaceApiKey, stabilityApiKey, hasVisited, setHasVisited]);
+
 
   const handleGenerate = useCallback(async (promptToGenerate: string, model: GenerationModel, aspectRatio: AspectRatio) => {
     let activeApiKey: string | null = null;
@@ -129,7 +139,8 @@ function App() {
           />
           <ImageDisplay 
             images={images} 
-            isLoading={isLoading} 
+            isLoading={isLoading}
+            prompt={prompt}
             error={error} 
             isQuotaError={isQuotaError}
             onDeleteImage={handleDeleteImage}
@@ -139,7 +150,7 @@ function App() {
         </main>
         <footer className="text-center mt-12">
             <p className="text-xs text-slate-400 dark:text-slate-500">
-                WesAI Image Generator v3.0
+                WesAI Image Generator v3.1
             </p>
         </footer>
         {isSettingsOpen && <SettingsModal onClose={() => setIsSettingsOpen(false)} />}
