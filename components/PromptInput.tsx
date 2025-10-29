@@ -1,10 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import Spinner from './Spinner';
 import SamplePrompts from './SamplePrompts';
 import ModelSelector from './ModelSelector';
 import AspectRatioSelector from './AspectRatioSelector';
 import { ApiKeyContext } from '../contexts/ApiKeyContext';
 import { GenerationModel, AspectRatio } from '../types';
+import { ClearInputIcon } from './Icons';
 
 interface PromptInputProps {
   prompt: string;
@@ -26,11 +27,25 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, onGenerate
   const [selectedModel, setSelectedModel] = useState<GenerationModel>('gemini');
   const [selectedAspectRatio, setSelectedAspectRatio] = useState<AspectRatio>('1:1');
   const { geminiApiKey, huggingFaceApiKey, stabilityApiKey } = useContext(ApiKeyContext);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   let isApiKeySet = false;
   if (selectedModel === 'gemini') isApiKeySet = !!geminiApiKey;
   else if (selectedModel === 'huggingface') isApiKeySet = !!huggingFaceApiKey;
   else if (selectedModel === 'stabilityai') isApiKeySet = !!stabilityApiKey;
+
+  // Auto-resize textarea height based on content
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto'; // Reset height to recalculate
+      const scrollHeight = textarea.scrollHeight;
+      const minHeight = 112; // h-28 in pixels
+      const maxHeight = 240; // max height in pixels before scrolling
+      textarea.style.height = `${Math.max(minHeight, Math.min(scrollHeight, maxHeight))}px`;
+    }
+  }, [prompt]);
+
 
   // Reset aspect ratio if it becomes unsupported by the selected model
   React.useEffect(() => {
@@ -68,15 +83,29 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, onGenerate
   return (
     <form onSubmit={handleSubmit} className="w-full flex flex-col items-center gap-6">
       <div className="w-full">
-        <textarea
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder={getPlaceholderText()}
-          className="w-full h-28 p-4 bg-white border border-slate-300 text-slate-900 placeholder-slate-400 rounded-lg shadow-inner focus:ring-2 focus:ring-pink-500 focus:outline-none resize-none transition-colors duration-200 ease-in-out dark:bg-slate-800 dark:border-slate-600 dark:text-slate-50 dark:placeholder-slate-500"
-          disabled={isLoading || (!geminiApiKey && !huggingFaceApiKey && !stabilityApiKey)}
-          aria-label="Image generation prompt"
-          maxLength={PROMPT_MAX_LENGTH}
-        />
+        <div className="relative w-full">
+          <textarea
+            ref={textareaRef}
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            placeholder={getPlaceholderText()}
+            className="w-full h-28 p-4 pr-10 bg-white border border-slate-300 text-slate-900 placeholder-slate-400 rounded-lg shadow-inner focus:ring-2 focus:ring-pink-500 focus:outline-none resize-none transition-all duration-150 ease-in-out dark:bg-slate-800 dark:border-slate-600 dark:text-slate-50 dark:placeholder-slate-500 overflow-y-auto"
+            disabled={isLoading || (!geminiApiKey && !huggingFaceApiKey && !stabilityApiKey)}
+            aria-label="Image generation prompt"
+            maxLength={PROMPT_MAX_LENGTH}
+            style={{ minHeight: '112px' }}
+          />
+          {prompt && !isLoading && (
+            <button
+              type="button"
+              onClick={() => setPrompt('')}
+              className="absolute top-3 right-3 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-500"
+              aria-label="Clear prompt"
+            >
+              <ClearInputIcon />
+            </button>
+          )}
+        </div>
         <p className="text-right text-xs text-slate-400 dark:text-slate-500 mt-1 pr-1">
           {prompt.length} / {PROMPT_MAX_LENGTH}
         </p>

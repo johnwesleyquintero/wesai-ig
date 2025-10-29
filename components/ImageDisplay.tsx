@@ -18,6 +18,25 @@ interface ImageDisplayProps {
   onUsePrompt: (prompt: string) => void;
 }
 
+const LatestImageSkeleton = () => (
+  <div className="animate-pulse space-y-12">
+    <div>
+      <div className="mb-4 border-b-2 border-slate-200 dark:border-slate-700 pb-2">
+          <div className="h-7 bg-slate-200 dark:bg-slate-700 rounded w-1/3"></div>
+      </div>
+      <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700">
+         <div className="w-full aspect-square bg-slate-200 dark:bg-slate-700 rounded-md"></div>
+         <div className="mt-4 flex flex-col sm:flex-row items-center justify-end gap-3">
+              <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-md w-full sm:w-32"></div>
+              <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-md w-full sm:w-32"></div>
+              <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-md w-full sm:w-32"></div>
+         </div>
+      </div>
+    </div>
+  </div>
+);
+
+
 const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, isQuotaError, onDeleteImage, onSaveEditedImage, onUsePrompt }) => {
   const [latestImage, ...historyImages] = images;
   const { mockupSrc, isCreatingMockup, createMockup } = useMockup(latestImage ? latestImage.src : null);
@@ -41,13 +60,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
 
   return (
     <div aria-live="polite">
-      {isLoading && (
-        <div className="flex flex-col items-center justify-center text-center p-8 bg-slate-100 dark:bg-slate-800 rounded-lg">
-          <Spinner size="large" />
-          <p className="mt-4 text-lg text-slate-700 dark:text-slate-300">Generating your masterpiece...</p>
-          <p className="text-sm text-slate-500">This may take a moment.</p>
-        </div>
-      )}
+      {isLoading && <LatestImageSkeleton />}
 
       {error && <ErrorAlert message={error} isQuotaError={isQuotaError} />}
 
@@ -134,7 +147,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
                     <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-2">
                       <p className="text-white text-xs text-center line-clamp-4">{image.prompt}</p>
                     </div>
-                     <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                     <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-60 group-hover:opacity-100 transition-opacity duration-300 z-10">
                         <button
                             onClick={(e) => handleActionClick(e, () => onUsePrompt(image.prompt))}
                             className="p-1.5 bg-black/60 rounded-full text-white hover:bg-purple-500 hover:scale-110 transition-all duration-200"

@@ -1,6 +1,5 @@
 import { useState, useEffect, Dispatch, SetStateAction } from 'react';
 
-// FIX: Change React.Dispatch and React.SetStateAction to Dispatch and SetStateAction and import them from react.
 function useLocalStorage<T>(key: string, initialValue: T): [T, Dispatch<SetStateAction<T>>] {
   // Get from local storage then
   // parse stored json or return initialValue
@@ -23,7 +22,6 @@ function useLocalStorage<T>(key: string, initialValue: T): [T, Dispatch<SetState
 
   // Return a wrapped version of useState's setter function that ...
   // ... persists the new value to localStorage.
-  // FIX: Change React.Dispatch and React.SetStateAction to Dispatch and SetStateAction.
   const setValue: Dispatch<SetStateAction<T>> = (value) => {
     // Prevent build errors with server-side rendering
     if (typeof window == 'undefined') {
