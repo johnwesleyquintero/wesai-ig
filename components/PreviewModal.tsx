@@ -1,13 +1,20 @@
 import React from 'react';
 import type { GeneratedImage } from '../types';
-import { CloseIcon, DownloadIcon } from './Icons';
+import { CloseIcon, DownloadIcon, UsePromptIcon } from './Icons';
 
 interface PreviewModalProps {
   image: GeneratedImage;
   onClose: () => void;
+  onUsePrompt: (prompt: string) => void;
 }
 
-const PreviewModal: React.FC<PreviewModalProps> = ({ image, onClose }) => {
+const PreviewModal: React.FC<PreviewModalProps> = ({ image, onClose, onUsePrompt }) => {
+
+  const handleUsePrompt = () => {
+    onUsePrompt(image.prompt);
+    onClose();
+  }
+
   return (
     <div
       className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
@@ -41,7 +48,14 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ image, onClose }) => {
             />
         </div>
         
-        <div className="flex-shrink-0 flex justify-end">
+        <div className="flex-shrink-0 flex justify-end gap-3">
+             <button
+                onClick={handleUsePrompt}
+                className="inline-flex items-center justify-center px-4 py-2 text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-md hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors duration-200"
+            >
+                <UsePromptIcon />
+                <span className="ml-2">Use as Prompt</span>
+             </button>
              <a
                 href={image.src}
                 download={`generated-image-${image.id}.jpeg`}

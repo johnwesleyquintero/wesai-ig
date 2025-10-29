@@ -6,7 +6,7 @@ import ErrorAlert from './ErrorAlert';
 import MockupDisplay from './MockupDisplay';
 import PreviewModal from './PreviewModal';
 import CanvasModal from './CanvasModal';
-import { CopyIcon, DownloadIcon, ImageIcon, TrashIcon, EditIcon } from './Icons';
+import { CopyIcon, DownloadIcon, ImageIcon, TrashIcon, EditIcon, UsePromptIcon } from './Icons';
 
 interface ImageDisplayProps {
   images: GeneratedImage[];
@@ -15,9 +15,10 @@ interface ImageDisplayProps {
   isQuotaError: boolean;
   onDeleteImage: (id: string) => void;
   onSaveEditedImage: (originalPrompt: string, editPrompt: string, editedSrc: string) => void;
+  onUsePrompt: (prompt: string) => void;
 }
 
-const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, isQuotaError, onDeleteImage, onSaveEditedImage }) => {
+const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, isQuotaError, onDeleteImage, onSaveEditedImage, onUsePrompt }) => {
   const [latestImage, ...historyImages] = images;
   const { mockupSrc, isCreatingMockup, createMockup } = useMockup(latestImage ? latestImage.src : null);
   const [copied, setCopied] = React.useState(false);
@@ -32,10 +33,11 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
       }
   };
   
-  const handleDelete = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation(); // Prevent the preview modal from opening when deleting
-    onDeleteImage(id);
+  const handleActionClick = (e: React.MouseEvent, action: () => void) => {
+    e.stopPropagation(); // Prevent parent button (preview) from being clicked
+    action();
   };
+
 
   return (
     <div aria-live="polite">
@@ -132,13 +134,24 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
                     <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-2">
                       <p className="text-white text-xs text-center line-clamp-4">{image.prompt}</p>
                     </div>
-                     <button
-                        onClick={(e) => handleDelete(e, image.id)}
-                        className="absolute top-2 right-2 p-1.5 bg-black/60 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-500 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-500 z-10"
-                        aria-label="Delete image"
-                      >
-                        <TrashIcon />
-                      </button>
+                     <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                        <button
+                            onClick={(e) => handleActionClick(e, () => onUsePrompt(image.prompt))}
+                            className="p-1.5 bg-black/60 rounded-full text-white hover:bg-purple-500 hover:scale-110 transition-all duration-200"
+                            aria-label="Use as prompt"
+                            title="Use as Prompt"
+                        >
+                            <UsePromptIcon />
+                        </button>
+                        <button
+                            onClick={(e) => handleActionClick(e, () => onDeleteImage(image.id))}
+                            className="p-1.5 bg-black/60 rounded-full text-white hover:bg-red-500 hover:scale-110 transition-all duration-200"
+                            aria-label="Delete image"
+                            title="Delete Image"
+                        >
+                            <TrashIcon />
+                        </button>
+                    </div>
                   </button>
                 ))}
               </div>
@@ -156,7 +169,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, error, i
       )}
 
       {previewImage && (
-        <PreviewModal image={previewImage} onClose={() => setPreviewImage(null)} />
+        <PreviewModal image={previewImage} onClose={() => setPreviewImage(null)} onUsePrompt={onUsePrompt} />
       )}
 
       {editingImage && (

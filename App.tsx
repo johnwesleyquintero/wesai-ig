@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext, useEffect } from 'react';
+import React, { useState, useCallback, useContext } from 'react';
 import Header from './components/Header';
 import PromptInput from './components/PromptInput';
 import ImageDisplay from './components/ImageDisplay';
@@ -10,9 +10,11 @@ import { generateImageWithStabilityAI } from './services/stabilityService';
 import { ApiKeyContext } from './contexts/ApiKeyContext';
 import type { GeneratedImage, GenerationModel, AspectRatio } from './types';
 import { InfoIcon } from './components/Icons';
+import useLocalStorage from './hooks/useLocalStorage';
 
 function App() {
-  const [images, setImages] = useState<GeneratedImage[]>([]);
+  const [images, setImages] = useLocalStorage<GeneratedImage[]>('wesai_image_library', []);
+  const [prompt, setPrompt] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isQuotaError, setIsQuotaError] = useState<boolean>(false);
@@ -20,20 +22,7 @@ function App() {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const { geminiApiKey, huggingFaceApiKey, stabilityApiKey, isKeyLoading } = useContext(ApiKeyContext);
 
-  // Load images from localStorage on initial render
-  useEffect(() => {
-    try {
-      const storedImages = localStorage.getItem('wesai_image_library');
-      if (storedImages) {
-        setImages(JSON.parse(storedImages));
-      }
-    } catch (e) {
-      console.error("Failed to parse images from localStorage", e);
-      localStorage.removeItem('wesai_image_library'); // Clear corrupted data
-    }
-  }, []);
-
-  const handleGenerate = useCallback(async (prompt: string, model: GenerationModel, aspectRatio: AspectRatio) => {
+  const handleGenerate = useCallback(async (promptToGenerate: string, model: GenerationModel, aspectRatio: AspectRatio) => {
     let activeApiKey: string | null = null;
     if (model === 'gemini') activeApiKey = geminiApiKey;
     if (model === 'huggingface') activeApiKey = huggingFaceApiKey;
@@ -51,31 +40,32 @@ function App() {
 
     try {
       let imageUrl;
+      // For non-Gemini models, force aspect ratio to 1:1 as they don't support others.
+      const finalAspectRatio = model === 'gemini' ? aspectRatio : '1:1';
+
       if (model === 'gemini') {
         try {
-          imageUrl = await generateImageWithGemini(prompt, geminiApiKey!, aspectRatio);
+          imageUrl = await generateImageWithGemini(promptToGenerate, geminiApiKey!, finalAspectRatio);
         } catch (geminiErr) {
           // Smart Failover: If Gemini fails, try Stability AI if key exists.
           const isGeminiQuotaError = geminiErr instanceof Error && (geminiErr.message.includes('quota') || geminiErr.message.includes('billing'));
           if (isGeminiQuotaError && stabilityApiKey) {
             console.log("Gemini quota error, attempting fallback to Stability AI...");
-            imageUrl = await generateImageWithStabilityAI(prompt, stabilityApiKey, aspectRatio);
+            imageUrl = await generateImageWithStabilityAI(promptToGenerate, stabilityApiKey, '1:1');
           } else {
             throw geminiErr; // Re-throw other Gemini errors
           }
         }
       } else if (model === 'stabilityai') {
-        imageUrl = await generateImageWithStabilityAI(prompt, stabilityApiKey!, aspectRatio);
+        imageUrl = await generateImageWithStabilityAI(promptToGenerate, stabilityApiKey!, '1:1');
       }
       else {
-        imageUrl = await generateImageWithHuggingFace(prompt, huggingFaceApiKey!);
+        imageUrl = await generateImageWithHuggingFace(promptToGenerate, huggingFaceApiKey!);
       }
 
       setImages(prevImages => {
-        const newImage: GeneratedImage = { id: Date.now().toString(), src: imageUrl, prompt };
-        const updatedImages = [newImage, ...prevImages];
-        localStorage.setItem('wesai_image_library', JSON.stringify(updatedImages));
-        return updatedImages;
+        const newImage: GeneratedImage = { id: Date.now().toString(), src: imageUrl, prompt: promptToGenerate };
+        return [newImage, ...prevImages];
       });
     } catch (err) {
       const message = err instanceof Error ? err.message : "An unknown error occurred.";
@@ -93,23 +83,22 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [geminiApiKey, huggingFaceApiKey, stabilityApiKey]);
+  }, [geminiApiKey, huggingFaceApiKey, stabilityApiKey, setImages]);
 
   const handleDeleteImage = (idToDelete: string) => {
-    setImages(prevImages => {
-      const updatedImages = prevImages.filter(img => img.id !== idToDelete);
-      localStorage.setItem('wesai_image_library', JSON.stringify(updatedImages));
-      return updatedImages;
-    });
+    setImages(prevImages => prevImages.filter(img => img.id !== idToDelete));
+  };
+  
+  const handleUsePrompt = (newPrompt: string) => {
+    setPrompt(newPrompt);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSaveEditedImage = (originalPrompt: string, editPrompt: string, editedSrc: string) => {
     setImages(prevImages => {
       const newPrompt = `Edit: "${editPrompt}" -- (Original: ${originalPrompt})`;
       const newImage: GeneratedImage = { id: Date.now().toString(), src: editedSrc, prompt: newPrompt };
-      const updatedImages = [newImage, ...prevImages];
-      localStorage.setItem('wesai_image_library', JSON.stringify(updatedImages));
-      return updatedImages;
+      return [newImage, ...prevImages];
     });
   };
 
@@ -132,7 +121,12 @@ function App() {
               </div>
             </div>
           )}
-          <PromptInput onGenerate={handleGenerate} isLoading={isLoading} />
+          <PromptInput 
+            prompt={prompt}
+            setPrompt={setPrompt}
+            onGenerate={handleGenerate} 
+            isLoading={isLoading} 
+          />
           <ImageDisplay 
             images={images} 
             isLoading={isLoading} 
@@ -140,8 +134,14 @@ function App() {
             isQuotaError={isQuotaError}
             onDeleteImage={handleDeleteImage}
             onSaveEditedImage={handleSaveEditedImage}
+            onUsePrompt={handleUsePrompt}
           />
         </main>
+        <footer className="text-center mt-12">
+            <p className="text-xs text-slate-400 dark:text-slate-500">
+                WesAI Image Generator v3.0
+            </p>
+        </footer>
         {isSettingsOpen && <SettingsModal onClose={() => setIsSettingsOpen(false)} />}
         {isHelpOpen && <HelpModal onClose={() => setIsHelpOpen(false)} />} 
       </div>

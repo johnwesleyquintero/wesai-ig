@@ -13,6 +13,7 @@ interface CanvasModalProps {
 
 const CanvasModal: React.FC<CanvasModalProps> = ({ image, onClose, onSave }) => {
   const [editPrompt, setEditPrompt] = useState('');
+  const [lastSuccessfulPrompt, setLastSuccessfulPrompt] = useState('');
   const [currentSrc, setCurrentSrc] = useState(image.src);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +28,8 @@ const CanvasModal: React.FC<CanvasModalProps> = ({ image, onClose, onSave }) => 
     try {
       const newImageSrc = await editImageWithGemini(currentSrc, editPrompt, geminiApiKey);
       setCurrentSrc(newImageSrc);
+      setLastSuccessfulPrompt(editPrompt);
+      setEditPrompt(''); // Clear prompt on success
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred during editing.');
     } finally {
@@ -36,7 +39,8 @@ const CanvasModal: React.FC<CanvasModalProps> = ({ image, onClose, onSave }) => 
   
   const handleSave = () => {
     if (hasBeenEdited) {
-      onSave(image.prompt, editPrompt, currentSrc);
+      // Use the last successful prompt for saving, as the input may have been cleared
+      onSave(image.prompt, lastSuccessfulPrompt, currentSrc);
     }
     onClose();
   };
