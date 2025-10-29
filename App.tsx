@@ -4,6 +4,7 @@ import PromptInput from './components/PromptInput';
 import ImageDisplay from './components/ImageDisplay';
 import SettingsModal from './components/SettingsModal';
 import HelpModal from './components/HelpModal';
+import Toast from './components/Toast';
 import { generateImageWithGemini } from './services/geminiService';
 import { generateImageWithHuggingFace } from './services/clientService';
 import { generateImageWithStabilityAI } from './services/stabilityService';
@@ -11,6 +12,8 @@ import { ApiKeyContext } from './contexts/ApiKeyContext';
 import type { GeneratedImage, GenerationModel, AspectRatio } from './types';
 import { InfoIcon } from './components/Icons';
 import useLocalStorage from './hooks/useLocalStorage';
+import useToast from './hooks/useToast';
+
 
 function App() {
   const [images, setImages] = useLocalStorage<GeneratedImage[]>('wesai_image_library', []);
@@ -22,6 +25,7 @@ function App() {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const { geminiApiKey, huggingFaceApiKey, stabilityApiKey, isKeyLoading } = useContext(ApiKeyContext);
   const [hasVisited, setHasVisited] = useLocalStorage<boolean>('wesai_has_visited', false);
+  const { isToastVisible, toastMessage, showToast } = useToast();
 
   // Proactive onboarding for first-time users
   useEffect(() => {
@@ -119,9 +123,11 @@ function App() {
           onSettingsClick={() => setIsSettingsOpen(true)} 
           onHelpClick={() => setIsHelpOpen(true)}
         />
-        <main className="mt-8 space-y-8">
-          {!isKeyLoading && !geminiApiKey && !huggingFaceApiKey && !stabilityApiKey && (
-            <div className="bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600/50 text-amber-800 dark:text-amber-200 px-4 py-3 rounded-lg flex items-center justify-between shadow-sm" role="alert">
+        
+        {/* Sticky container for prompt input and alerts */}
+        <div className="sticky top-0 z-10 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-lg -mx-4 sm:-mx-6 px-4 sm:px-6 py-6">
+           {!isKeyLoading && !geminiApiKey && !huggingFaceApiKey && !stabilityApiKey && (
+            <div className="bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600/50 text-amber-800 dark:text-amber-200 px-4 py-3 rounded-lg flex items-center justify-between shadow-sm mb-6" role="alert">
               <div className="flex items-center">
                 <InfoIcon />
                 <p className="ml-3 font-medium">
@@ -137,6 +143,9 @@ function App() {
             onGenerate={handleGenerate} 
             isLoading={isLoading} 
           />
+        </div>
+        
+        <main className="mt-8 space-y-8">
           <ImageDisplay 
             images={images} 
             isLoading={isLoading}
@@ -146,15 +155,19 @@ function App() {
             onDeleteImage={handleDeleteImage}
             onSaveEditedImage={handleSaveEditedImage}
             onUsePrompt={handleUsePrompt}
+            showToast={showToast}
           />
         </main>
+
         <footer className="text-center mt-12">
             <p className="text-xs text-slate-400 dark:text-slate-500">
-                WesAI Image Generator v3.1
+                WesAI Image Generator v3.2
             </p>
         </footer>
+        
         {isSettingsOpen && <SettingsModal onClose={() => setIsSettingsOpen(false)} />}
-        {isHelpOpen && <HelpModal onClose={() => setIsHelpOpen(false)} />} 
+        {isHelpOpen && <HelpModal onClose={() => setIsHelpOpen(false)} />}
+        <Toast message={toastMessage} isVisible={isToastVisible} />
       </div>
     </div>
   );

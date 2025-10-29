@@ -17,7 +17,15 @@ interface ImageDisplayProps {
   onDeleteImage: (id: string) => void;
   onSaveEditedImage: (originalPrompt: string, editPrompt: string, editedSrc: string) => void;
   onUsePrompt: (prompt: string) => void;
+  showToast: (message: string) => void;
 }
+
+const samplePrompts = [
+  "A photorealistic portrait of an elderly fisherman with a weathered face, looking out at a stormy sea.",
+  "An enchanted forest at twilight, glowing mushrooms, ethereal light filtering through ancient trees, fantasy art.",
+  "A sleek, futuristic cityscape in the style of cyberpunk, flying vehicles and neon signs, cinematic lighting.",
+  "A watercolor painting of a cozy cafe in Paris on a rainy day, people visible through the steamy window.",
+];
 
 const LatestImageSkeleton: React.FC<{ prompt: string }> = ({ prompt }) => (
     <div className="space-y-12">
@@ -26,38 +34,43 @@ const LatestImageSkeleton: React.FC<{ prompt: string }> = ({ prompt }) => (
             <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-slate-100">Generating...</h2>
             {prompt && <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 truncate">Your prompt: "{prompt}"</p>}
         </div>
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 animate-pulse">
-           <div className="w-full aspect-square bg-slate-200 dark:bg-slate-700 rounded-md"></div>
-           <div className="mt-4 flex flex-col sm:flex-row items-center justify-end gap-3">
-                <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-md w-full sm:w-32"></div>
-                <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-md w-full sm:w-32"></div>
-                <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-md w-full sm:w-32"></div>
-                <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-md w-full sm:w-32"></div>
-           </div>
+        <div className="relative p-1 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 rounded-lg shadow-lg bg-[length:200%_200%] animate-pulse-gradient">
+            <div className="bg-white dark:bg-slate-800 p-4 rounded-md">
+                <div className="w-full aspect-square bg-slate-200 dark:bg-slate-700 rounded-md"></div>
+                <div className="mt-4 flex flex-col sm:flex-row items-center justify-end gap-3">
+                        <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-md w-full sm:w-32"></div>
+                        <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-md w-full sm:w-32"></div>
+                        <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-md w-full sm:w-32"></div>
+                        <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-md w-full sm:w-32"></div>
+                </div>
+            </div>
         </div>
       </div>
     </div>
   );
 
 
-const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, prompt, error, isQuotaError, onDeleteImage, onSaveEditedImage, onUsePrompt }) => {
+const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, prompt, error, isQuotaError, onDeleteImage, onSaveEditedImage, onUsePrompt, showToast }) => {
   const [latestImage, ...historyImages] = images;
   const { mockupSrc, isCreatingMockup, createMockup } = useMockup(latestImage ? latestImage.src : null);
-  const [copied, setCopied] = React.useState(false);
   const [previewImage, setPreviewImage] = React.useState<GeneratedImage | null>(null);
   const [editingImage, setEditingImage] = React.useState<GeneratedImage | null>(null);
 
   const handleCopyPrompt = () => {
       if (latestImage) {
         navigator.clipboard.writeText(latestImage.prompt);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        showToast('Prompt copied to clipboard!');
       }
   };
   
   const handleActionClick = (e: React.MouseEvent, action: () => void) => {
     e.stopPropagation(); // Prevent parent button (preview) from being clicked
     action();
+  };
+  
+  const handleTrySample = () => {
+    const randomPrompt = samplePrompts[Math.floor(Math.random() * samplePrompts.length)];
+    onUsePrompt(randomPrompt);
   };
 
 
@@ -82,21 +95,21 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, prompt, 
                       className="w-full h-auto object-cover rounded-md"
                    />
                    <div className="mt-4 flex flex-col sm:flex-row items-center justify-end gap-3">
-                        <button onClick={handleCopyPrompt} className="w-full sm:w-auto flex items-center justify-center px-4 py-2 text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-md hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors duration-200">
+                        <button onClick={handleCopyPrompt} className="w-full sm:w-auto flex items-center justify-center px-4 py-2 text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-md hover:bg-slate-200 dark:hover:bg-slate-600 transition-transform duration-200 hover:scale-105">
                             <CopyIcon />
-                            <span className="ml-2">{copied ? 'Copied!' : 'Copy Prompt'}</span>
+                            <span className="ml-2">Copy Prompt</span>
                         </button>
                         <button 
                             onClick={createMockup}
                             disabled={isCreatingMockup}
-                            className="w-full sm:w-auto flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 transition-colors duration-200"
+                            className="w-full sm:w-auto flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 transition-transform duration-200 hover:scale-105"
                         >
                             {isCreatingMockup ? <Spinner /> : <MockupIcon />}
                             <span className="ml-1">{isCreatingMockup ? 'Creating...' : 'Mockup'}</span>
                         </button>
                         <button 
                             onClick={() => setEditingImage(latestImage)}
-                            className="w-full sm:w-auto flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700 transition-colors duration-200"
+                            className="w-full sm:w-auto flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700 transition-transform duration-200 hover:scale-105"
                         >
                             <EditIcon />
                             <span>Edit</span>
@@ -104,7 +117,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, prompt, 
                         <a
                            href={latestImage.src}
                            download={`generated-image-${Date.now()}.jpeg`}
-                           className="w-full sm:w-auto flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-pink-600 rounded-md hover:bg-pink-700 transition-colors duration-200"
+                           className="w-full sm:w-auto flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-pink-600 rounded-md hover:bg-pink-700 transition-transform duration-200 hover:scale-105"
                         >
                             <DownloadIcon />
                             <span>Download</span>
@@ -143,7 +156,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, prompt, 
                     <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-2">
                       <p className="text-white text-xs text-center line-clamp-4">{image.prompt}</p>
                     </div>
-                     <div className="absolute top-2 right-2 flex flex-col gap-2 transition-opacity duration-300 z-10">
+                     <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent flex justify-end gap-2 z-10">
                         <button
                             onClick={(e) => handleActionClick(e, () => onUsePrompt(image.prompt))}
                             className="p-1.5 bg-black/50 rounded-full text-white hover:bg-purple-500 hover:scale-110 transition-all duration-200"
@@ -173,7 +186,15 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ images, isLoading, prompt, 
         <div className="text-center p-12 bg-slate-100/50 dark:bg-slate-800/50 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg">
           <ImageIcon />
           <p className="mt-4 text-lg font-medium text-slate-600 dark:text-slate-400">Your masterpiece awaits.</p>
-          <p className="text-slate-500 text-sm mt-1">Enter a prompt above and let your imagination take flight.</p>
+          <p className="text-slate-500 text-sm mt-1">Enter a prompt above or try one of our samples to begin.</p>
+          <div className="mt-6">
+            <button
+                onClick={handleTrySample}
+                className="px-4 py-2 font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg shadow-md hover:from-purple-700 hover:to-pink-700 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300"
+            >
+                Try a Sample Prompt
+            </button>
+          </div>
         </div>
       )}
 
