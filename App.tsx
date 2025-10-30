@@ -6,7 +6,7 @@ import SettingsModal from './components/SettingsModal';
 import HelpModal from './components/HelpModal';
 import Toast from './components/Toast';
 import { generateImageWithGemini } from './services/geminiService';
-import { generateImageWithHuggingFace } from './services/clientService';
+import { generateImageWithHuggingFace } from './services/huggingFaceService';
 import { generateImageWithStabilityAI } from './services/stabilityService';
 import { ApiKeyContext } from './contexts/ApiKeyContext';
 import type { GeneratedImage, GenerationModel, AspectRatio } from './types';
@@ -99,25 +99,34 @@ function App() {
     }
   }, [geminiApiKey, huggingFaceApiKey, stabilityApiKey, setImages]);
 
-  const handleDeleteImage = (idToDelete: string) => {
+  const handleDeleteImage = useCallback((idToDelete: string) => {
     setImages(prevImages => prevImages.filter(img => img.id !== idToDelete));
-  };
+  }, [setImages]);
   
-  const handleUsePrompt = (newPrompt: string) => {
+  const handleUsePrompt = useCallback((newPrompt: string) => {
     setPrompt(newPrompt);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }, []);
 
-  const handleSaveEditedImage = (originalPrompt: string, editPrompt: string, editedSrc: string) => {
+  const handleSaveEditedImage = useCallback((originalPrompt: string, editPrompt: string, editedSrc: string) => {
     setImages(prevImages => {
       const newPrompt = `Edit: "${editPrompt}" -- (Original: ${originalPrompt})`;
       const newImage: GeneratedImage = { id: Date.now().toString(), src: editedSrc, prompt: newPrompt };
       return [newImage, ...prevImages];
     });
-  };
+  }, [setImages]);
+
+  const handleClearHistory = useCallback(() => {
+    // We only clear the "history" images, keeping the latest one if it exists.
+    if (window.confirm("Are you sure you want to delete all images in your history? This action cannot be undone.")) {
+      setImages(prevImages => (prevImages.length > 0 ? [prevImages[0]] : []));
+      showToast("Image history cleared.");
+    }
+  }, [setImages, showToast]);
+
 
   return (
-    <div className="min-h-screen text-slate-800 dark:text-slate-200 flex flex-col items-center font-sans p-4 sm:p-6">
+    <div className="min-h-screen flex flex-col items-center font-sans p-4 sm:p-6">
       <div className="w-full max-w-4xl" aria-busy={isLoading}>
         <Header 
           onSettingsClick={() => setIsSettingsOpen(true)} 
@@ -125,7 +134,7 @@ function App() {
         />
         
         {/* Sticky container for prompt input and alerts */}
-        <div className="sticky top-0 z-10 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-lg -mx-4 sm:-mx-6 px-4 sm:px-6 py-6">
+        <div className="sticky top-0 z-10 bg-slate-100/80 dark:bg-slate-950/80 backdrop-blur-lg -mx-4 sm:-mx-6 px-4 sm:px-6 pt-6 pb-4">
            {!isKeyLoading && !geminiApiKey && !huggingFaceApiKey && !stabilityApiKey && (
             <div className="bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600/50 text-amber-800 dark:text-amber-200 px-4 py-3 rounded-lg flex items-center justify-between shadow-sm mb-6" role="alert">
               <div className="flex items-center">
@@ -155,13 +164,14 @@ function App() {
             onDeleteImage={handleDeleteImage}
             onSaveEditedImage={handleSaveEditedImage}
             onUsePrompt={handleUsePrompt}
+            onClearHistory={handleClearHistory}
             showToast={showToast}
           />
         </main>
 
         <footer className="text-center mt-12">
             <p className="text-xs text-slate-400 dark:text-slate-500">
-                WesAI Image Generator v3.2
+                WesAI Image Generator v3.3
             </p>
         </footer>
         

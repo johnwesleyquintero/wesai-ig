@@ -84,3 +84,34 @@ export const CheckIcon = () => (
         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
     </svg>
 );
+
+export const EyeIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+        <path fillRule="evenodd" d="M.458 10C3.732 4.943 9.522 4.5 10 4.5c.478 0 6.268.443 9.542 5.5.01.011.018.022.026.033a.5.5 0 010 .934c-.008.011-.016.022-.026.033C16.268 15.057 10.478 15.5 10 15.5c-.478 0-6.268-.443-9.542-5.5a.5.5 0 010-.934zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+    </svg>
+);
+
+export const BroomIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1.161l4.086-2.215a1 1 0 011.06 1.664l-4.086 2.215A6.984 6.984 0 0115 10v2.215l1.547-2.68a1 1 0 111.732 1l-1.547 2.68A8.96 8.96 0 0118 13.5V16a1 1 0 01-1 1h-1.5a1 1 0 01-1-1v-2.5a.5.5 0 00-.5-.5H11a.5.5 0 00-.5.5V16a1 1 0 01-1 1H8a1 1 0 01-1-1v-2.5a.5.5 0 00-.5-.5H4a1 1 0 01-1-1V6a1 1 0 011-1h1V3a1 1 0 011-1z" clipRule="evenodd" />
+    </svg>
+);
+
+export const SquareIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 3h16a1 1 0 011 1v16a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1z" />
+    </svg>
+);
+
+export const PortraitIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 3h12a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2z" />
+    </svg>
+);
+
+export const LandscapeIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6z" />
+    </svg>
+);

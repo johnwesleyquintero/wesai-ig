@@ -52,16 +52,19 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
         <div className="mt-4 space-y-4 text-slate-700 dark:text-slate-300 overflow-y-auto max-h-[60vh]">
             {activeTab === 'whats-new' && (
                 <div className="animate-fade-in-scale">
-                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Major Upgrade: Tri-Provider Engine</h3>
+                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">UI/UX Polish & Quality of Life</h3>
                     <ul className="list-disc list-inside space-y-3 mt-2">
                         <li>
-                            <span className="font-semibold">New Engine: Stability AI:</span> We've added the powerful Stable Diffusion XL model via the ClipDrop API, perfect for artistic and creative image styles.
+                            <span className="font-semibold">Inspirational Welcome Mat:</span> The new empty state now features a gallery of sample images. Click one to instantly load its prompt and start creating!
                         </li>
                         <li>
-                            <span className="font-semibold">Expanded Model Selection:</span> You can now choose between Google Gemini, Stability AI, and Hugging Face to find the perfect style for your vision.
+                            <span className="font-semibold">Clearer History Management:</span> The "Clear Library" button has been renamed to "Clear History" to better reflect its function of clearing all but the latest image.
                         </li>
                         <li>
-                           <span className="font-semibold">Smart Failover 2.0:</span> If Gemini runs into a quota limit, the app will automatically try again with Stability AI to keep you creating.
+                           <span className="font-semibold">Visual Aspect Ratios:</span> The aspect ratio selector now includes icons for a more intuitive experience.
+                        </li>
+                         <li>
+                           <span className="font-semibold">Codebase Housekeeping:</span> We've tidied up the project structure for better maintainability and faster future updates.
                         </li>
                     </ul>
                 </div>

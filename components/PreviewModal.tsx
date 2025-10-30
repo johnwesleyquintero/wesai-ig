@@ -6,14 +6,25 @@ interface PreviewModalProps {
   image: GeneratedImage;
   onClose: () => void;
   onUsePrompt: (prompt: string) => void;
+  showToast: (message: string) => void;
 }
 
-const PreviewModal: React.FC<PreviewModalProps> = ({ image, onClose, onUsePrompt }) => {
+const PreviewModal: React.FC<PreviewModalProps> = ({ image, onClose, onUsePrompt, showToast }) => {
 
   const handleUsePrompt = () => {
     onUsePrompt(image.prompt);
     onClose();
-  }
+  };
+
+  const handleDownload = () => {
+    const link = document.createElement('a');
+    link.href = image.src;
+    link.download = `generated-image-${image.id}.jpeg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast("Download started!");
+  };
 
   return (
     <div
@@ -56,14 +67,13 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ image, onClose, onUsePrompt
                 <UsePromptIcon />
                 <span className="ml-2">Use as Prompt</span>
              </button>
-             <a
-                href={image.src}
-                download={`generated-image-${image.id}.jpeg`}
+             <button
+                onClick={handleDownload}
                 className="inline-flex items-center justify-center px-6 py-2.5 font-semibold text-white bg-pink-600 rounded-lg shadow-md hover:bg-pink-700 transition-colors duration-200"
             >
                 <DownloadIcon />
                 <span>Download Image</span>
-            </a>
+            </button>
         </div>
       </div>
     </div>

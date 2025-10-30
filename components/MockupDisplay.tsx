@@ -3,10 +3,21 @@ import { DownloadIcon } from './Icons';
 
 interface MockupDisplayProps {
   mockupSrc: string;
+  showToast: (message: string) => void;
 }
 
-const MockupDisplay: React.FC<MockupDisplayProps> = ({ mockupSrc }) => {
+const MockupDisplay: React.FC<MockupDisplayProps> = ({ mockupSrc, showToast }) => {
     
+  const handleDownload = () => {
+    const link = document.createElement('a');
+    link.href = mockupSrc;
+    link.download = `a-plus-mockup-${Date.now()}.jpeg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast("A+ Mockup download started!");
+  };
+
   return (
     <div className="mt-8">
       <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-4 border-b-2 border-slate-200 dark:border-slate-700 pb-2">A+ Content Mockup</h2>
@@ -20,14 +31,13 @@ const MockupDisplay: React.FC<MockupDisplayProps> = ({ mockupSrc }) => {
         </div>
       </div>
       <div className="mt-6">
-        <a
-          href={mockupSrc}
-          download={`a-plus-mockup-${Date.now()}.jpeg`}
+        <button
+          onClick={handleDownload}
           className="inline-flex items-center justify-center px-8 py-3 font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg shadow-md hover:from-purple-700 hover:to-pink-700 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300"
         >
           <DownloadIcon />
           Download Mockup
-        </a>
+        </button>
       </div>
     </div>
   );
