@@ -3,6 +3,7 @@ export interface GeneratedImage {
   id: string;
   src: string;
   prompt: string;
+  negativePrompt?: string;
 }
 
 export type GenerationModel = 'gemini' | 'huggingface' | 'stabilityai';

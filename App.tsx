@@ -36,7 +36,7 @@ function App() {
   }, [isKeyLoading, geminiApiKey, huggingFaceApiKey, stabilityApiKey, hasVisited, setHasVisited]);
 
 
-  const handleGenerate = useCallback(async (promptToGenerate: string, model: GenerationModel, aspectRatio: AspectRatio) => {
+  const handleGenerate = useCallback(async (promptToGenerate: string, model: GenerationModel, aspectRatio: AspectRatio, negativePrompt?: string) => {
     let activeApiKey: string | null = null;
     if (model === 'gemini') activeApiKey = geminiApiKey;
     if (model === 'huggingface') activeApiKey = huggingFaceApiKey;
@@ -59,7 +59,7 @@ function App() {
 
       if (model === 'gemini') {
         try {
-          imageUrl = await generateImageWithGemini(promptToGenerate, geminiApiKey!, finalAspectRatio);
+          imageUrl = await generateImageWithGemini(promptToGenerate, geminiApiKey!, finalAspectRatio, negativePrompt);
         } catch (geminiErr) {
           // Smart Failover: If Gemini fails, try Stability AI if key exists.
           const isGeminiQuotaError = geminiErr instanceof Error && (geminiErr.message.includes('quota') || geminiErr.message.includes('billing'));
@@ -78,7 +78,7 @@ function App() {
       }
 
       setImages(prevImages => {
-        const newImage: GeneratedImage = { id: Date.now().toString(), src: imageUrl, prompt: promptToGenerate };
+        const newImage: GeneratedImage = { id: Date.now().toString(), src: imageUrl, prompt: promptToGenerate, negativePrompt };
         return [newImage, ...prevImages];
       });
     } catch (err) {
@@ -151,6 +151,7 @@ function App() {
             setPrompt={setPrompt}
             onGenerate={handleGenerate} 
             isLoading={isLoading} 
+            showToast={showToast}
           />
         </div>
         
@@ -171,7 +172,7 @@ function App() {
 
         <footer className="text-center mt-12">
             <p className="text-xs text-slate-400 dark:text-slate-500">
-                WesAI Image Generator v3.3
+                WesAI Image Generator v3.4
             </p>
         </footer>
         

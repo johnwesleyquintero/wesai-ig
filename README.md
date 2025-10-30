@@ -9,6 +9,8 @@ A simple and elegant web application to generate images from text prompts using 
 ## ✨ Features
 
 - **Tri-Provider AI Engine**: Choose between Google's `imagen-4.0`, Stability AI's `Stable Diffusion XL`, or Hugging Face's `stable-diffusion-xl-base-1.0`.
+- **Magic Prompt**: Intelligently expand a simple idea into a rich, descriptive prompt with a single click, powered by Gemini.
+- **Negative Prompts**: Fine-tune your creations by specifying what to exclude from the image (Gemini-exclusive feature).
 - **Smart Failover**: If the primary model (Gemini) hits a quota limit, the app automatically switches to a fallback provider (Stability AI) to ensure uninterrupted creativity.
 - **Aspect Ratio Control**: Generate images in square (1:1), portrait (3:4), or landscape (16:9) formats with the Gemini model.
 - **Persistent Image Library**: All your generated images are saved in your browser's local storage. Review, download, or delete your creations at any time.

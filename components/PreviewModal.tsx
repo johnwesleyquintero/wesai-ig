@@ -1,6 +1,6 @@
 import React from 'react';
 import type { GeneratedImage } from '../types';
-import { CloseIcon, DownloadIcon, UsePromptIcon } from './Icons';
+import { CloseIcon, DownloadIcon, UsePromptIcon, CopyIcon } from './Icons';
 
 interface PreviewModalProps {
   image: GeneratedImage;
@@ -14,6 +14,11 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ image, onClose, onUsePrompt
   const handleUsePrompt = () => {
     onUsePrompt(image.prompt);
     onClose();
+  };
+  
+  const handleCopyPrompt = () => {
+    navigator.clipboard.writeText(image.prompt);
+    showToast('Prompt copied to clipboard!');
   };
 
   const handleDownload = () => {
@@ -65,7 +70,14 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ image, onClose, onUsePrompt
                 className="inline-flex items-center justify-center px-4 py-2 text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-md hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors duration-200"
             >
                 <UsePromptIcon />
-                <span className="ml-2">Use as Prompt</span>
+                <span className="ml-2">Use Prompt</span>
+             </button>
+             <button
+                onClick={handleCopyPrompt}
+                className="inline-flex items-center justify-center px-4 py-2 text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-md hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors duration-200"
+            >
+                <CopyIcon />
+                <span className="ml-2">Copy Prompt</span>
              </button>
              <button
                 onClick={handleDownload}

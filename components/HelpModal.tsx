@@ -52,19 +52,19 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
         <div className="mt-4 space-y-4 text-slate-700 dark:text-slate-300 overflow-y-auto max-h-[60vh]">
             {activeTab === 'whats-new' && (
                 <div className="animate-fade-in-scale">
-                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">UI/UX Polish & Quality of Life</h3>
+                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">v3.4: The Control & Creativity Update</h3>
                     <ul className="list-disc list-inside space-y-3 mt-2">
                         <li>
-                            <span className="font-semibold">Inspirational Welcome Mat:</span> The new empty state now features a gallery of sample images. Click one to instantly load its prompt and start creating!
+                            <span className="font-semibold">Magic Prompt:</span> Stuck for ideas? Click the new **Magic Wand** button next to the Generate button to let Gemini turn your simple thought into a rich, artistic prompt.
                         </li>
                         <li>
-                            <span className="font-semibold">Clearer History Management:</span> The "Clear Library" button has been renamed to "Clear History" to better reflect its function of clearing all but the latest image.
+                            <span className="font-semibold">Negative Prompts:</span> Gain finer control over your images. For the Gemini model, you can now add a **Negative Prompt** to specify elements you want the AI to avoid in the final image.
                         </li>
                         <li>
-                           <span className="font-semibold">Visual Aspect Ratios:</span> The aspect ratio selector now includes icons for a more intuitive experience.
+                           <span className="font-semibold">UI/UX Polish:</span> The image preview modal now includes a 'Copy Prompt' button for better workflow consistency.
                         </li>
                          <li>
-                           <span className="font-semibold">Codebase Housekeeping:</span> We've tidied up the project structure for better maintainability and faster future updates.
+                           <span className="font-semibold">Codebase Refactoring:</span> We've refactored major parts of the codebase for better performance and to pave the way for exciting future features.
                         </li>
                     </ul>
                 </div>

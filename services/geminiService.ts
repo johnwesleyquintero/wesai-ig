@@ -5,7 +5,7 @@ import { AspectRatio } from "../types";
  * Handles image generation using the powerful Imagen model, which supports aspect ratios.
  * Throws a specific error for billing issues.
  */
-async function generateWithImagen(ai: GoogleGenAI, prompt: string, aspectRatio: AspectRatio): Promise<string> {
+async function generateWithImagen(ai: GoogleGenAI, prompt: string, aspectRatio: AspectRatio, negativePrompt?: string): Promise<string> {
     try {
         const response = await ai.models.generateImages({
             model: 'imagen-4.0-generate-001',
@@ -14,6 +14,7 @@ async function generateWithImagen(ai: GoogleGenAI, prompt: string, aspectRatio: 
               numberOfImages: 1,
               outputMimeType: 'image/jpeg',
               aspectRatio: aspectRatio,
+              negativePrompt: negativePrompt,
             },
         });
 
@@ -38,12 +39,16 @@ async function generateWithImagen(ai: GoogleGenAI, prompt: string, aspectRatio: 
 /**
  * Handles image generation using the accessible Flash model for 1:1 images.
  */
-async function generateWithFlash(ai: GoogleGenAI, prompt: string): Promise<string> {
+async function generateWithFlash(ai: GoogleGenAI, prompt: string, negativePrompt?: string): Promise<string> {
     try {
+        const finalPrompt = negativePrompt 
+            ? `${prompt}\n\n---\nNegative Prompt: Do not include the following elements: ${negativePrompt}` 
+            : prompt;
+
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash-image',
             contents: {
-                parts: [{ text: prompt }],
+                parts: [{ text: finalPrompt }],
             },
             config: {
                 responseModalities: [Modality.IMAGE],
@@ -75,17 +80,18 @@ async function generateWithFlash(ai: GoogleGenAI, prompt: string): Promise<strin
  * @param prompt The text prompt to generate an image from.
  * @param apiKey The Google AI API key.
  * @param aspectRatio The desired aspect ratio for the image.
+ * @param negativePrompt An optional prompt of what to avoid in the image.
  * @returns A promise that resolves to a data URL of the generated image.
  */
-export async function generateImageWithGemini(prompt: string, apiKey: string, aspectRatio: AspectRatio): Promise<string> {
+export async function generateImageWithGemini(prompt: string, apiKey: string, aspectRatio: AspectRatio, negativePrompt?: string): Promise<string> {
   const ai = new GoogleGenAI({ apiKey });
 
   // If a specific aspect ratio is requested, use the powerful Imagen model.
   // Otherwise, use the more accessible Flash model for standard 1:1 generation.
   if (aspectRatio !== '1:1') {
-      return generateWithImagen(ai, prompt, aspectRatio);
+      return generateWithImagen(ai, prompt, aspectRatio, negativePrompt);
   } else {
-      return generateWithFlash(ai, prompt);
+      return generateWithFlash(ai, prompt, negativePrompt);
   }
 }
 
