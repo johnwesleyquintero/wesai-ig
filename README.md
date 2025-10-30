@@ -10,11 +10,11 @@ A simple and elegant web application to generate images from text prompts using 
 
 - **Tri-Provider AI Engine**: Choose between Google's `imagen-4.0`, Stability AI's `Stable Diffusion XL`, or Hugging Face's `stable-diffusion-xl-base-1.0`.
 - **Magic Prompt**: Intelligently expand a simple idea into a rich, descriptive prompt with a single click, powered by Gemini.
+- **Image Editing Canvas**: Perform iterative edits on your creations using natural language in a dedicated editing canvas.
 - **Negative Prompts**: Fine-tune your creations by specifying what to exclude from the image (Gemini-exclusive feature).
 - **Smart Failover**: If the primary model (Gemini) hits a quota limit, the app automatically switches to a fallback provider (Stability AI) to ensure uninterrupted creativity.
 - **Aspect Ratio Control**: Generate images in square (1:1), portrait (3:4), or landscape (16:9) formats with the Gemini model.
-- **Persistent Image Library**: All your generated images are saved in your browser's local storage. Review, download, or delete your creations at any time.
-- **Client-Side Focused**: Runs directly in the browser, making it easy to deploy on any static hosting platform.
+- **Unified Results View**: Your latest image and persistent history are combined in a single, intuitive feed, saved in your browser's local storage.
 - **Multi-API Key Management**: A clean, tabbed settings modal allows you to securely save your Google, Stability AI, and Hugging Face API keys.
 - **A+ Content Mockup**: Automatically generate an e-commerce-ready "A+ Content" mockup from your generated image.
 - **Sleek, Responsive UI**: A modern interface with light and dark modes, designed to work beautifully on any device.
@@ -22,8 +22,8 @@ A simple and elegant web application to generate images from text prompts using 
 ## 🛠️ Tech Stack
 
 - **Frontend**: [React](https://reactjs.org/) (with TypeScript)
-- **AI Providers**: 
-    - [Google Gemini API](https://ai.google.dev/)
+- **AI Services**:
+    - [Google Gemini API](https://ai.google.dev/) via a unified generation service
     - [Stability AI API (ClipDrop)](https://clipdrop.co/apis)
     - [Hugging Face Inference API](https://huggingface.co/inference-api)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
@@ -61,12 +61,12 @@ To get a local copy up and running, follow these simple steps.
 
 ## ⚙️ How It Works
 
-This application communicates directly with the Google, Stability AI, and Hugging Face APIs from the client-side.
+This application communicates directly with the AI provider APIs from the client-side.
 
 -   When you enter your API keys, they are saved securely in your browser's `localStorage`.
--   When you submit a prompt, the application sends a `fetch` request to the selected API provider, including your prompt and the corresponding API key.
+-   When you submit a prompt, a unified `generationService` determines the correct provider and sends a `fetch` request, including your prompt and the corresponding API key.
 -   The API returns an image, which is then converted into a data URL and displayed on the page.
--   The smart failover logic provides a seamless experience by automatically retrying with an alternate provider if a quota error is detected.
+-   The smart failover logic is handled within the service, providing a seamless experience by automatically retrying with an alternate provider if a quota error is detected.
 
 ## 🤝 Contributing
 

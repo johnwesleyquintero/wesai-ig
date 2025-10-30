@@ -5,9 +5,7 @@ import ImageDisplay from './components/ImageDisplay';
 import SettingsModal from './components/SettingsModal';
 import HelpModal from './components/HelpModal';
 import Toast from './components/Toast';
-import { generateImageWithGemini } from './services/geminiService';
-import { generateImageWithHuggingFace } from './services/huggingFaceService';
-import { generateImageWithStabilityAI } from './services/stabilityService';
+import { generateImage } from './services/generationService';
 import { ApiKeyContext } from './contexts/ApiKeyContext';
 import type { GeneratedImage, GenerationModel, AspectRatio } from './types';
 import { InfoIcon } from './components/Icons';
@@ -53,29 +51,15 @@ function App() {
     setIsQuotaError(false);
 
     try {
-      let imageUrl;
-      // For non-Gemini models, force aspect ratio to 1:1 as they don't support others.
-      const finalAspectRatio = model === 'gemini' ? aspectRatio : '1:1';
-
-      if (model === 'gemini') {
-        try {
-          imageUrl = await generateImageWithGemini(promptToGenerate, geminiApiKey!, finalAspectRatio, negativePrompt);
-        } catch (geminiErr) {
-          // Smart Failover: If Gemini fails, try Stability AI if key exists.
-          const isGeminiQuotaError = geminiErr instanceof Error && (geminiErr.message.includes('quota') || geminiErr.message.includes('billing'));
-          if (isGeminiQuotaError && stabilityApiKey) {
-            console.log("Gemini quota error, attempting fallback to Stability AI...");
-            imageUrl = await generateImageWithStabilityAI(promptToGenerate, stabilityApiKey, '1:1');
-          } else {
-            throw geminiErr; // Re-throw other Gemini errors
-          }
-        }
-      } else if (model === 'stabilityai') {
-        imageUrl = await generateImageWithStabilityAI(promptToGenerate, stabilityApiKey!, '1:1');
-      }
-      else {
-        imageUrl = await generateImageWithHuggingFace(promptToGenerate, huggingFaceApiKey!);
-      }
+      const imageUrl = await generateImage({
+        prompt: promptToGenerate,
+        model,
+        aspectRatio,
+        negativePrompt,
+        geminiApiKey,
+        huggingFaceApiKey,
+        stabilityApiKey
+      });
 
       setImages(prevImages => {
         const newImage: GeneratedImage = { id: Date.now().toString(), src: imageUrl, prompt: promptToGenerate, negativePrompt };
@@ -117,8 +101,7 @@ function App() {
   }, [setImages]);
 
   const handleClearHistory = useCallback(() => {
-    // We only clear the "history" images, keeping the latest one if it exists.
-    if (window.confirm("Are you sure you want to delete all images in your history? This action cannot be undone.")) {
+    if (window.confirm("Are you sure you want to clear your image history? Your latest image will be kept.")) {
       setImages(prevImages => (prevImages.length > 0 ? [prevImages[0]] : []));
       showToast("Image history cleared.");
     }
@@ -172,7 +155,7 @@ function App() {
 
         <footer className="text-center mt-12">
             <p className="text-xs text-slate-400 dark:text-slate-500">
-                WesAI Image Generator v3.4
+                WesAI Image Generator v3.5
             </p>
         </footer>
         

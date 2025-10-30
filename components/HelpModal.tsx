@@ -52,19 +52,19 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
         <div className="mt-4 space-y-4 text-slate-700 dark:text-slate-300 overflow-y-auto max-h-[60vh]">
             {activeTab === 'whats-new' && (
                 <div className="animate-fade-in-scale">
-                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">v3.4: The Control & Creativity Update</h3>
+                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">v3.5: The Workflow & Polish Update</h3>
                     <ul className="list-disc list-inside space-y-3 mt-2">
                         <li>
-                            <span className="font-semibold">Magic Prompt:</span> Stuck for ideas? Click the new **Magic Wand** button next to the Generate button to let Gemini turn your simple thought into a rich, artistic prompt.
+                            <span className="font-semibold">Unified Results View:</span> Your latest image and history are now seamlessly combined into a single, unified results feed for a more intuitive browsing experience.
                         </li>
                         <li>
-                            <span className="font-semibold">Negative Prompts:</span> Gain finer control over your images. For the Gemini model, you can now add a **Negative Prompt** to specify elements you want the AI to avoid in the final image.
+                            <span className="font-semibold">Streamlined Codebase:</span> We've consolidated our AI service logic, making the app faster, more reliable, and easier to maintain.
                         </li>
                         <li>
-                           <span className="font-semibold">UI/UX Polish:</span> The image preview modal now includes a 'Copy Prompt' button for better workflow consistency.
+                           <span className="font-semibold">UI Refinements:</span> Small but meaningful design tweaks across the app create a cleaner and more polished interface.
                         </li>
                          <li>
-                           <span className="font-semibold">Codebase Refactoring:</span> We've refactored major parts of the codebase for better performance and to pave the way for exciting future features.
+                           <span className="font-semibold">Image Editing Canvas:</span> You can now perform iterative edits on your generated images in a dedicated editing canvas, powered by Gemini.
                         </li>
                     </ul>
                 </div>

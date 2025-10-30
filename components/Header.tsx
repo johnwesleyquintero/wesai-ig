@@ -9,7 +9,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onSettingsClick, onHelpClick }) => {
     return (
-      <header className="w-full flex flex-col items-center pb-6 border-b border-slate-200 dark:border-slate-800">
+      <header className="w-full flex flex-col items-center pb-6">
         {/* Actions group - right aligned at the top */}
         <div className="w-full flex items-center justify-end gap-2 mb-4">
             <ThemeSwitcher />

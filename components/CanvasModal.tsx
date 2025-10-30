@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import type { GeneratedImage } from '../types';
 import { ApiKeyContext } from '../contexts/ApiKeyContext';
-import { editImageWithGemini } from '../services/geminiService';
+import { editImageWithGemini } from '../services/generationService';
 import { CloseIcon, RevertIcon, EditIcon } from './Icons';
 import Spinner from './Spinner';
 
